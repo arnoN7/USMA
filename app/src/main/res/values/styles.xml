@@ -1,0 +1,25 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="colorPrimary">@color/USMABlue</item>
+        <item name="colorPrimaryDark">@color/USMABlueDark</item>
+        <!-- Customize your theme here. -->
+    </style>
+    <style name="button_light" parent="@android:style/Widget.Button">
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+        <item name="android:textColor">@color/USMABlue</item>
+        <item name="android:shadowColor">@color/USMABlue</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">-1</item>
+        <item name="android:shadowRadius">0.2</item>
+        <item name="android:textSize">40dip</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/button_light</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:paddingLeft">@dimen/padding_medium</item>
+        <item name="android:paddingRight">@dimen/padding_medium</item>
+    </style>
+</resources>
