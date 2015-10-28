@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Created by Arnaud Rover on 18/09/15.
@@ -36,13 +37,21 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         ImageView profile;
         TextView Name;
         TextView email;
+        Context context;
 
 
 
-        public ViewHolder(View itemView,int ViewType) {                 // Creating ViewHolder Constructor with View and viewType As a parameter
+        public ViewHolder(View itemView,int ViewType, final Context context) {                 // Creating ViewHolder Constructor with View and viewType As a parameter
             super(itemView);
-
-
+            this.context = context;
+            itemView.setClickable(true);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, "The Item Clicked is: " + getPosition(), Toast.LENGTH_SHORT).show();
+                    ((MainActivity) context).selectItem(getPosition());
+                }
+            });
             // Here we set the appropriate view in accordance with the the view type as passed when the holder object is created
 
             if(ViewType == TYPE_ITEM) {
@@ -58,6 +67,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
                 profile = (ImageView) itemView.findViewById(R.id.circleView);// Creating Image view object from header.xml for profile pic
                 Holderid = 0;                                                // Setting holder id = 0 as the object being populated are of type header view
             }
+
         }
 
 
@@ -91,7 +101,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         if (viewType == TYPE_ITEM) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row_navigation,parent,false); //Inflating the layout
 
-            ViewHolder vhItem = new ViewHolder(v,viewType); //Creating ViewHolder and passing the object of type view
+            ViewHolder vhItem = new ViewHolder(v,viewType, context); //Creating ViewHolder and passing the object of type view
 
             return vhItem; // Returning the created object
 
@@ -101,7 +111,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.header,parent,false); //Inflating the layout
 
-            ViewHolder vhHeader = new ViewHolder(v,viewType); //Creating ViewHolder and passing the object of type view
+            ViewHolder vhHeader = new ViewHolder(v,viewType, context); //Creating ViewHolder and passing the object of type view
 
             return vhHeader; //returning the object created
 

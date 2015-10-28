@@ -10,4 +10,10 @@
     <dimen name="padding_small">3dp</dimen>
     <dimen name="TextDimTop">5dp</dimen>
     <dimen name="tool_bar_top_padding">24dp</dimen>
+
+    <dimen name="fab_button_diameter">56dp</dimen>
+    <dimen name="fab_button_margin_bottom">16dp</dimen>
+    <dimen name="fab_button_margin_right">16dp</dimen>
+    <dimen name="elevation_low">1dp</dimen>
+    <dimen name="elevation_high">8dp</dimen>
 </resources>

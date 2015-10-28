@@ -1,5 +1,9 @@
 package example.com.usma;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.net.Uri;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -7,22 +11,36 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
-public class MainActivity extends ActionBarActivity {
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseRole;
+import com.parse.ParseUser;
+
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends ActionBarActivity implements ListFragment.OnFragmentInteractionListener{
 
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
     public NavigationMenu[] navigationMenu = {NavigationMenu.RACES, NavigationMenu.TRAINING,
-            NavigationMenu.GROUPS, NavigationMenu.LICENCE};
+            NavigationMenu.GROUPS, NavigationMenu.LICENCE, NavigationMenu.USERS};
+    private List<Fragment> fragments;
 
     //Similarly we Create a String Resource for the name and email in the header view
     //And we also create a int resource for profile picture in the header view
 
-    String NAME = "Akash Bangad";
-    String EMAIL = "akash.bangad@android4devs.com";
+    String name;
+    String email;
     int PROFILE = R.drawable.logousma;
 
     private Toolbar toolbar;                              // Declaring the Toolbar Object
@@ -47,6 +65,9 @@ public class MainActivity extends ActionBarActivity {
      */
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
+        name = ParseUser.getCurrentUser().getString(User.FIRSTNAME) + " "
+                + ParseUser.getCurrentUser().getString(User.NAME);
+        email = ParseUser.getCurrentUser().getEmail();
 
 
 
@@ -55,11 +76,19 @@ public class MainActivity extends ActionBarActivity {
 
         mRecyclerView.setHasFixedSize(true);                            // Letting the system know that the list objects are of fixed size
 
-        mAdapter = new NavigationDrawerAdapter(navigationMenu,NAME,EMAIL,PROFILE, this);       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
+        mAdapter = new NavigationDrawerAdapter(navigationMenu,name,email,PROFILE, this);       // Creating the Adapter of MyAdapter class(which we are going to see in a bit)
         // And passing the titles,icons,header view name, header view email,
         // and header view profile picture
 
         mRecyclerView.setAdapter(mAdapter);                              // Setting the adapter to RecyclerView
+
+        final GestureDetector mGestureDetector = new GestureDetector(MainActivity.this, new GestureDetector.SimpleOnGestureListener() {
+
+            @Override public boolean onSingleTapUp(MotionEvent e) {
+                return true;
+            }
+
+        });
 
         mLayoutManager = new LinearLayoutManager(this);                 // Creating a layout Manager
 
@@ -88,6 +117,8 @@ public class MainActivity extends ActionBarActivity {
         Drawer.setDrawerListener(mDrawerToggle); // Drawer Listener set to the Drawer toggle
         mDrawerToggle.syncState();               // Finally we set the drawer toggle sync State
 
+        initFragments();
+
     }
 
 
@@ -111,5 +142,80 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public DrawerLayout getDrawer() {
+        return Drawer;
+    }
+
+    public void selectItem(int position) {
+        // update the main content by replacing fragments
+        Fragment fragment = fragments.get(position-1);
+
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        ft.replace(R.id.content_frame, fragment);
+        ft.commit();
+
+        // update selected item title, then close the drawer
+        //setTitle(((TodoListFragment) fragment).getTodoListRole().getString(Todo.LIST_NAME_KEY));
+        //TODO
+        getDrawer().closeDrawers();
+    }
+
+    private void initFragments () {
+        fragments = new ArrayList<Fragment>();
+        for (int i = 0; i < navigationMenu.length; i++) {
+            switch (navigationMenu[i]) {
+                case USERS:
+                    ListFragmentUsers fragment = ListFragmentUsers.newInstance();
+                    fragments.add(fragment);
+                    ParseQuery<ParseUser> queryUsers = ParseUser.getQuery();
+                    queryUsers.findInBackground(new FindCallback<ParseUser>() {
+                        @Override
+                        public void done(List<ParseUser> listUsers, ParseException e) {
+                            ((ListFragmentUsers)fragments.get(NavigationMenu.USERS.getId())).setUsers(listUsers);
+                            Toast debug = Toast.makeText(getApplication(), "Users Loaded", Toast.LENGTH_LONG);
+                            debug.show();
+                        }
+                    });
+
+                    break;
+                case GROUPS:
+                    ListFragmentGroups fragmentGroups = ListFragmentGroups.newInstance();
+                    fragments.add(fragmentGroups);
+                    ParseQuery<ParseRole> queryGroups = ParseRole.getQuery();
+                    queryGroups.findInBackground(new FindCallback<ParseRole>() {
+                        @Override
+                        public void done(List<ParseRole> listRole, ParseException e) {
+                            ((ListFragmentGroups)fragments.get(NavigationMenu.GROUPS.getId())).setGroups(listRole);
+                            Toast debug = Toast.makeText(getApplication(), "Groups Loaded", Toast.LENGTH_LONG);
+                            debug.show();
+                        }
+                    });
+
+                    break;
+                case RACES:
+                    ListFragmentRace fragmentRaces = ListFragmentRace.newInstance();
+                    fragments.add(fragmentRaces);
+
+                    break;
+                case TRAINING:
+                    ListFragmentTraining fragmentTraining = ListFragmentTraining.newInstance();
+                    fragments.add(fragmentTraining);
+                    break;
+
+                case LICENCE:
+                    ListFragmentLicence fragmentLicence = ListFragmentLicence.newInstance();
+                    fragments.add(fragmentLicence);
+                    break;
+
+            }
+        }
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }

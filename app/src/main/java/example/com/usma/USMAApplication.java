@@ -26,10 +26,10 @@ public class USMAApplication extends Application{
         // enable the Local Datastore
         Parse.enableLocalDatastore(getApplicationContext());
         Parse.initialize(this, "MGT2MkcrSNgKQU56BuFE7CsJUt74q79mbFAXD7c9", "Z9zTcIVDu4Qmjs6YrEwSuiB6Cv3RpptN4dv1zRnz");
-        ParseUser.enableRevocableSessionInBackground();
-        ParseUser.enableAutomaticUser();
-        ParseACL defaultACL = new ParseACL();
-        ParseACL.setDefaultACL(defaultACL, true);
+        //ParseUser.enableRevocableSessionInBackground();
+        //ParseUser.enableAutomaticUser();
+        //ParseACL defaultACL = new ParseACL();
+        //ParseACL.setDefaultACL(defaultACL, true);
 
 
         /*ParsePush.("", new SaveCallback() {

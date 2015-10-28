@@ -8,23 +8,25 @@
 
 
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="vertical"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        >
 
         <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
-            android:textColor="#ffffff"
+            android:textColor="@color/USMABlue"
             android:text="Akash Bangad"
             android:textSize="14sp"
             android:textStyle="bold"
+            android:layout_marginTop="8dp"
 
             />
 
@@ -32,15 +34,23 @@
             android:id="@+id/email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#ffffff"
+            android:textColor="@color/USMABlue"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="5dp"
             android:text="akash.bangad93@gmail.com"
             android:textSize="14sp"
             android:textStyle="normal"
-
+            android:layout_below="@id/name"
             />
-    </LinearLayout>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/disconnect"
+            android:layout_toRightOf="@id/email"
+            android:layout_below="@id/name"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/ic_lock_black_24dp"/>
+    </RelativeLayout>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:layout_width="70dp"

@@ -5,6 +5,7 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="colorPrimary">@color/USMABlue</item>
         <item name="colorPrimaryDark">@color/USMABlueDark</item>
+
         <!-- Customize your theme here. -->
     </style>
     <style name="button_light" parent="@android:style/Widget.Button">

@@ -283,7 +283,7 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
             try {
                 currentUser = ParseUser.logIn(mEmail, mPassword);
                 if (currentUser != null && currentUser.getEmail().equals(mEmail)) {
-                    Intent goToHomeActivity = new Intent(getApplication(), MainActivityOld.class);
+                    Intent goToHomeActivity = new Intent(getApplication(), MainActivity.class);
                     startActivity(goToHomeActivity);
                     return true;
                 } else {
