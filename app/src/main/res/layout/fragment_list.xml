@@ -13,20 +13,9 @@
             android:id="@+id/fragment_list_recycler_view"
             android:scrollbars="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/fab_ic_add"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="@dimen/fab_button_margin_bottom"
-            android:layout_marginRight="@dimen/fab_button_margin_right"
-            app:elevation="6dp"
-            app:pressedTranslationZ="12dp"
-            app:borderWidth="0dp"/>
     </RelativeLayout>
 
 </FrameLayout>

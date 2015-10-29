@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
         Drawer.setDrawerListener(mDrawerToggle); // Drawer Listener set to the Drawer toggle
         mDrawerToggle.syncState();               // Finally we set the drawer toggle sync State
 
+
         initFragments();
 
     }

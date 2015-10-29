@@ -1,14 +1,15 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Base.AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/USMABlue</item>
         <item name="colorPrimaryDark">@color/USMABlueDark</item>
         <item name="colorAccent">@color/USMAAccent</item>
 
         <!-- Customize your theme here. -->
     </style>
-
+    <style name="AppTheme" parent="Base.AppTheme">
+    </style>
     <!-- theme tool bar. -->
     <style name="AppToolBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:textColorPrimary">@android:color/white</item>
