@@ -1,13 +1,19 @@
 package example.com.usma;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatCallback;
+import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -28,7 +34,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends ActionBarActivity implements ListFragment.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements ListFragment.OnFragmentInteractionListener{
 
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
@@ -43,12 +49,11 @@ public class MainActivity extends ActionBarActivity implements ListFragment.OnFr
     String email;
     int PROFILE = R.drawable.logousma;
 
-    private Toolbar toolbar;                              // Declaring the Toolbar Object
-
     RecyclerView mRecyclerView;                           // Declaring RecyclerView
     RecyclerView.Adapter mAdapter;                        // Declaring Adapter For Recycler View
     RecyclerView.LayoutManager mLayoutManager;            // Declaring Layout Manager as a linear layout manager
     DrawerLayout Drawer;                                  // Declaring DrawerLayout
+    private Toolbar toolbar;
 
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
 
@@ -60,9 +65,6 @@ public class MainActivity extends ActionBarActivity implements ListFragment.OnFr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-    /* Assinging the toolbar object ot the view
-    and setting the the Action bar to our toolbar
-     */
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
         name = ParseUser.getCurrentUser().getString(User.FIRSTNAME) + " "
@@ -96,7 +98,7 @@ public class MainActivity extends ActionBarActivity implements ListFragment.OnFr
 
 
         Drawer = (DrawerLayout) findViewById(R.id.DrawerLayout);        // Drawer object Assigned to the view
-        mDrawerToggle = new ActionBarDrawerToggle(this,Drawer,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close){
+        mDrawerToggle = new ActionBarDrawerToggle(this,Drawer,toolbar, R.string.navigation_drawer_open,R.string.navigation_drawer_close){
 
             @Override
             public void onDrawerOpened(View drawerView) {
