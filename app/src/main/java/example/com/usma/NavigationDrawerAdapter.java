@@ -1,6 +1,7 @@
 package example.com.usma;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.parse.ParseUser;
 
 /**
  * Created by Arnaud Rover on 18/09/15.
@@ -38,6 +41,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         TextView Name;
         TextView email;
         Context context;
+        ImageView mDisconnect;
 
 
 
@@ -66,6 +70,13 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
                 email = (TextView) itemView.findViewById(R.id.email);       // Creating Text View object from header.xml for email
                 profile = (ImageView) itemView.findViewById(R.id.circleView);// Creating Image view object from header.xml for profile pic
                 Holderid = 0;                                                // Setting holder id = 0 as the object being populated are of type header view
+                mDisconnect = (ImageView) itemView.findViewById(R.id.disconnect);
+                mDisconnect.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ((MainActivity) context).logout();
+                    }
+                });
             }
 
         }

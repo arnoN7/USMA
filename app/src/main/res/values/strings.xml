@@ -34,5 +34,20 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="hint_name">Nom</string>
+    <string name="hint_firstname">Prénom</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_licence">Numéro de licence</string>
+    <string name="hint_bithdate">Date de naissance</string>
+    <string name="save_user">Ajouter l\' adhérent</string>
+    <string name="user_added">ajouté</string>
+    <string name="cancel">Annuler</string>
+
+    <string name="err_msg_name">Entrer le nom de l\'adhérent</string>
+    <string name="err_msg_firstname">Entrer le prénom de l\'adhérent</string>
+    <string name="err_msg_email">Entrer l\'email de l\'adhérent</string>
+    <string name="err_msg_licence">Entrer le numéro de licence de l\'adhérent</string>
+    <string name="err_msg_birthdate">Entrer la date de naissance</string>
+
 
 </resources>

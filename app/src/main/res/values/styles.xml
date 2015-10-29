@@ -5,6 +5,7 @@
         <item name="colorPrimary">@color/USMABlue</item>
         <item name="colorPrimaryDark">@color/USMABlueDark</item>
         <item name="colorAccent">@color/USMAAccent</item>
+        <item name="android:windowBackground">@color/white</item>
 
         <!-- Customize your theme here. -->
     </style>

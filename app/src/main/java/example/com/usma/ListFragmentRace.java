@@ -15,4 +15,9 @@ public class ListFragmentRace extends ListFragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+    @Override
+    public void newItem() {
+        //TODO
+    }
 }

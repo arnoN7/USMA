@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:padding="8dp"
+    android:padding="@dimen/padding_medium"
     >
 
     <android.support.v7.widget.CardView
@@ -13,7 +13,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:padding="@dimen/padding_small"
             >
 
             <ImageView
@@ -31,7 +31,7 @@
                 android:id="@+id/item_name"
                 android:layout_toRightOf="@+id/image_item"
                 android:layout_alignParentTop="true"
-                android:textSize="30sp"
+                android:textSize="14sp"
                 />
 
             <TextView
@@ -40,6 +40,7 @@
                 android:id="@+id/item_description"
                 android:layout_toRightOf="@+id/image_item"
                 android:layout_below="@+id/item_name"
+                android:textSize="12sp"
                 />
 
         </RelativeLayout>

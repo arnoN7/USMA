@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -22,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
     public NavigationMenu[] navigationMenu = {NavigationMenu.RACES, NavigationMenu.TRAINING,
             NavigationMenu.GROUPS, NavigationMenu.LICENCE, NavigationMenu.USERS};
     private List<Fragment> fragments;
+    private ListFragment currentFragment;
 
     //Similarly we Create a String Resource for the name and email in the header view
     //And we also create a int resource for profile picture in the header view
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
     private Toolbar toolbar;
 
     ActionBarDrawerToggle mDrawerToggle;                  // Declaring Action Bar Drawer Toggle
+    FloatingActionButton buttonNew;
 
 
 
@@ -70,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
         name = ParseUser.getCurrentUser().getString(User.FIRSTNAME) + " "
                 + ParseUser.getCurrentUser().getString(User.NAME);
         email = ParseUser.getCurrentUser().getEmail();
+        buttonNew = (FloatingActionButton) findViewById(R.id.button_new);
 
 
 
@@ -139,11 +145,6 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -153,17 +154,29 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
 
     public void selectItem(int position) {
         // update the main content by replacing fragments
-        Fragment fragment = fragments.get(position-1);
+        if(position != 0 || position <= fragments.size()) {
+            final Fragment fragment = fragments.get(position-1);
 
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-        ft.replace(R.id.content_frame, fragment);
-        ft.commit();
-
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.content_frame, fragment);
+            ft.commit();
+            buttonNew.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((ListFragment)fragment).newItem();
+                }
+            });
+            currentFragment = (ListFragment) fragment;
+        }
         // update selected item title, then close the drawer
         //setTitle(((TodoListFragment) fragment).getTodoListRole().getString(Todo.LIST_NAME_KEY));
         //TODO
         getDrawer().closeDrawers();
+    }
+
+    public List<Fragment> getFragments() {
+        return fragments;
     }
 
     private void initFragments () {
@@ -217,8 +230,18 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
         }
     }
 
+    public ListFragment getCurrentFragment() {
+        return currentFragment;
+    }
+
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    public void logout() {
+        ParseUser.logOut();
+        Intent goToLoginActivity = new Intent(getApplication(), LoginActivity.class);
+        startActivity(goToLoginActivity);
     }
 }

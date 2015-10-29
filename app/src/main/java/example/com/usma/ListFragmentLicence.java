@@ -11,4 +11,9 @@ public class ListFragmentLicence extends ListFragment {
         ListFragmentLicence fragment = new ListFragmentLicence();
         return fragment;
     }
+
+    @Override
+    public void newItem() {
+        //TODO
+    }
 }

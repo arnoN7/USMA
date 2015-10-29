@@ -11,4 +11,9 @@ public class ListFragmentTraining extends ListFragment{
         ListFragmentTraining fragment = new ListFragmentTraining();
         return fragment;
     }
+
+    @Override
+    public void newItem() {
+        //TODO
+    }
 }
