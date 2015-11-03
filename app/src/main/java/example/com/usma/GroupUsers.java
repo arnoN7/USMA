@@ -6,6 +6,5 @@ package example.com.usma;
 public class GroupUsers {
     public static final String NAME = "name";
     public static final String DESCRIPTION = "description";
-    public static final String BIRTHDATE = "birthdate";
-    public static final String LICENCE = "licence";
+    public static final String ADMIN = "admin";
 }

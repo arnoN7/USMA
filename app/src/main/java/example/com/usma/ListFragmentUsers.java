@@ -34,15 +34,18 @@ public class ListFragmentUsers  extends ListFragment{
     public void setUsers(List<ParseUser> users) {
         this.users = users;
         List<Item> items = new ArrayList<>();
-        for (ParseUser user:users
-             ) {
-            items.add(new Item(NavigationMenu.USERS, user.get(User.FIRSTNAME) + " " + user.get(User.NAME), user.getEmail()));
+        if(users != null) {
+            for (ParseUser user : users
+                    ) {
+                items.add(new Item(NavigationMenu.USERS, user.get(User.FIRSTNAME) + " " +
+                        user.get(User.NAME), user.getEmail()));
+            }
         }
         super.setItems(items);
 
     }
     @Override
-    public void newItem() {
+    public void newItemAction() {
         // update the main content by replacing fragments
         final Fragment fragment = new NewUser();
         FragmentManager fragmentManager = getFragmentManager();

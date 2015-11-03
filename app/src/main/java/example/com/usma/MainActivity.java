@@ -1,21 +1,18 @@
 package example.com.usma;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.Nullable;
+import android.os.AsyncTask;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatCallback;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -24,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -33,11 +29,12 @@ import com.parse.ParseQuery;
 import com.parse.ParseRole;
 import com.parse.ParseUser;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ListFragment.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements
+        ListFragment.OnFragmentInteractionListener,
+        NewUser.OnFragmentInteractionListener{
 
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
@@ -45,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
             NavigationMenu.GROUPS, NavigationMenu.LICENCE, NavigationMenu.USERS};
     private List<Fragment> fragments;
     private ListFragment currentFragment;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+    private ParseRole adminRole;
 
     //Similarly we Create a String Resource for the name and email in the header view
     //And we also create a int resource for profile picture in the header view
@@ -68,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        adminRole = null;
         setContentView(R.layout.activity_main);
 
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
                 + ParseUser.getCurrentUser().getString(User.NAME);
         email = ParseUser.getCurrentUser().getEmail();
         buttonNew = (FloatingActionButton) findViewById(R.id.button_new);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
 
 
@@ -164,14 +165,13 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
             buttonNew.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((ListFragment)fragment).newItem();
+                    ((ListFragment)fragment).newItemAction();
                 }
             });
             currentFragment = (ListFragment) fragment;
         }
         // update selected item title, then close the drawer
-        //setTitle(((TodoListFragment) fragment).getTodoListRole().getString(Todo.LIST_NAME_KEY));
-        //TODO
+        collapsingToolbarLayout.setTitle(getString(navigationMenu[position-1].getNameID()));
         getDrawer().closeDrawers();
     }
 
@@ -184,8 +184,11 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
         for (int i = 0; i < navigationMenu.length; i++) {
             switch (navigationMenu[i]) {
                 case USERS:
-                    ListFragmentUsers fragment = ListFragmentUsers.newInstance();
+                    final ListFragmentUsers fragment = ListFragmentUsers.newInstance();
                     fragments.add(fragment);
+                    //init empty list for offline mode
+                    ((ListFragmentUsers)fragments.get(NavigationMenu.USERS.getId())).
+                            setUsers(new ArrayList<ParseUser>());
                     ParseQuery<ParseUser> queryUsers = ParseUser.getQuery();
                     queryUsers.findInBackground(new FindCallback<ParseUser>() {
                         @Override
@@ -200,25 +203,54 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
                 case GROUPS:
                     ListFragmentGroups fragmentGroups = ListFragmentGroups.newInstance();
                     fragments.add(fragmentGroups);
+                    //init empty list for offline mode
+                    ((ListFragmentGroups)fragments.get(NavigationMenu.GROUPS.getId())).
+                            setGroups(new ArrayList<ParseRole>());
                     ParseQuery<ParseRole> queryGroups = ParseRole.getQuery();
                     queryGroups.findInBackground(new FindCallback<ParseRole>() {
                         @Override
                         public void done(List<ParseRole> listRole, ParseException e) {
-                            ((ListFragmentGroups)fragments.get(NavigationMenu.GROUPS.getId())).setGroups(listRole);
-                            Toast debug = Toast.makeText(getApplication(), "Groups Loaded", Toast.LENGTH_LONG);
+                            ((ListFragmentGroups)fragments.get(NavigationMenu.GROUPS.getId())).
+                                    setGroups(listRole);
+                            adminRole = ((ListFragmentGroups)fragments.get(NavigationMenu.GROUPS.
+                                    getId())).getAdminRole();
+                            Toast debug = Toast.makeText(getApplication(), "Groups Loaded",
+                                    Toast.LENGTH_LONG);
                             debug.show();
                         }
                     });
 
                     break;
                 case RACES:
-                    ListFragmentRace fragmentRaces = ListFragmentRace.newInstance();
-                    fragments.add(fragmentRaces);
-
-                    break;
                 case TRAINING:
-                    ListFragmentTraining fragmentTraining = ListFragmentTraining.newInstance();
-                    fragments.add(fragmentTraining);
+                    ListFragmentSportEvent fragmentSportEvent = ListFragmentSportEvent.
+                            newInstance(navigationMenu[i]);
+                    fragments.add(fragmentSportEvent);
+                    //init empty list for offline mode
+                    ((ListFragmentSportEvent)fragments.get(i)).
+                            setSportEvents(new ArrayList<SportEvent>());
+                    ParseQuery<SportEvent> querySportEvent = ParseQuery.getQuery(SportEvent.class);
+                    querySportEvent.whereEqualTo(SportEvent.MENU_TYPE,
+                            getString(navigationMenu[i].getNameID()));
+                    querySportEvent.orderByDescending(SportEvent.DATE);
+                    querySportEvent.findInBackground(new FindCallback<SportEvent>() {
+                        @Override
+                        public void done(List<SportEvent> sportEvents, ParseException e) {
+                            NavigationMenu sportEventType;
+                            if ((sportEvents != null) && (sportEvents.size()>0)) {
+                                sportEventType = NavigationMenu.getNavigationIDByString(
+                                        sportEvents.get(0).getType(), getApplicationContext());
+                                ((ListFragmentSportEvent) fragments.get(sportEventType.getId())).
+                                        setSportEvents(sportEvents);
+                                Toast debug = Toast.makeText(getApplication(),
+                                        getString(sportEventType.getNameID()) + " loaded",
+                                        Toast.LENGTH_LONG);
+                                debug.show();
+                            }
+
+
+                        }
+                    });
                     break;
 
                 case LICENCE:
@@ -243,5 +275,33 @@ public class MainActivity extends AppCompatActivity implements ListFragment.OnFr
         ParseUser.logOut();
         Intent goToLoginActivity = new Intent(getApplication(), LoginActivity.class);
         startActivity(goToLoginActivity);
+    }
+
+    public void hideFab(boolean hide) {
+        CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams)    buttonNew.getLayoutParams();
+        if (hide) {
+            /*p.setAnchorId(View.NO_ID);
+            p.width = 0;
+            p.height = 0;
+            buttonNew.setLayoutParams(p);*/
+            buttonNew.setVisibility(View.GONE);
+        }
+        else {
+            buttonNew.setVisibility(View.VISIBLE);
+        }
+
+
+    }
+
+    public CollapsingToolbarLayout getCollapsingToolbarLayout() {
+        return collapsingToolbarLayout;
+    }
+
+    public class LoadFragmentTask extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            return null;
+        }
     }
 }

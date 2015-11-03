@@ -1,7 +1,10 @@
 package example.com.usma;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.view.View;
+import android.view.WindowManager;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
@@ -19,7 +22,8 @@ public class USMAApplication extends Application{
         context = getApplicationContext();
 
         // add todo's subclass
-        //ParseObject.registerSubclass(Todo.class);
+        ParseObject.registerSubclass(SportEvent.class);
+
 
 
 
@@ -46,5 +50,11 @@ public class USMAApplication extends Application{
 
     public static Context getContext() {
         return context;
+    }
+
+    public static void requestFocus(View view, Activity activity) {
+        if (view.requestFocus()) {
+            activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
     }
 }

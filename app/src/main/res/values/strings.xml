@@ -17,8 +17,8 @@
     <string name="action_sign_in">Connexion</string>
     <string name="action_sign_up">Inscription</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_invalid_email">L\'email est invalide</string>
+    <string name="error_invalid_password">Le mot de passe est trop court</string>
     <string name="error_incorrect_password">L\'email ou le numéro de licence sont incorrects</string>
     <string name="error_field_required">This field is required</string>
     <string name="welcome">L\'appli USMA</string>
@@ -34,14 +34,16 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!-- NewUser Strings -->
     <string name="hint_name">Nom</string>
     <string name="hint_firstname">Prénom</string>
     <string name="hint_email">Email</string>
     <string name="hint_licence">Numéro de licence</string>
     <string name="hint_bithdate">Date de naissance</string>
     <string name="save_user">Ajouter l\' adhérent</string>
-    <string name="user_added">ajouté</string>
+    <string name="added">ajouté</string>
     <string name="cancel">Annuler</string>
+    <string name="new_user">Nouvel Adhérent</string>
 
     <string name="err_msg_name">Entrer le nom de l\'adhérent</string>
     <string name="err_msg_firstname">Entrer le prénom de l\'adhérent</string>
@@ -49,5 +51,47 @@
     <string name="err_msg_licence">Entrer le numéro de licence de l\'adhérent</string>
     <string name="err_msg_birthdate">Entrer la date de naissance</string>
 
+    <!-- NewGroup Strings -->
+    <string name="hint_group_name">Nom du groupe</string>
+    <string name="hint_group_description">Description du groupe</string>
+    <string name="save_group">Ajouter le groupe</string>
+    <string name="new_group">Ajouter un groupe au club</string>
+
+    <string name="err_msg_group_name">Entrer le nom du groupe</string>
+
+    <!-- NewRace Strings -->
+    <string name="hint_race_name">Nom de la course</string>
+    <string name="hint_race_description">Détail sur la course (nombre de km, dénivelé, heure ...) </string>
+    <string name="race_type">Type de course</string>
+    <string name="hint_race_date">Date</string>
+    <string name="hint_race_address">Lieu de la course</string>
+    <string name="save_race">Enregistrer la course</string>
+
+    <string name="err_msg_race_name">Entrer le nom de la course</string>
+    <string name="err_msg_race_date">Entrer la date de la course</string>
+
+    <!-- NewTraining Strings -->
+    <string name="hint_training_name">Nom de l\'entraînement</string>
+    <string name="hint_training_description">Détail (nombre de km, fractionnés, récup ...) </string>
+    <string name="training_type">Type d\'entrainement</string>
+    <string name="hint_training_date">Date</string>
+    <string name="hint_training_address">Lieu de la séance</string>
+    <string name="save_training">Enregistrer la séance</string>
+    <string name="new_training">Nouvel entraînement</string>
+
+    <string name="err_msg_training_name">Entrer le nom de la séance</string>
+    <string name="err_msg_training_date">Entrer la date de la séance</string>
+
+    <string-array name="array_training_type">
+        <item>Fractionné</item>
+        <item>Endurance</item>
+        <item>Séance longue</item>
+    </string-array>
+
+    <string-array name="array_race_type">
+        <item>Route</item>
+        <item>Cross</item>
+        <item>Trail</item>
+    </string-array>
 
 </resources>

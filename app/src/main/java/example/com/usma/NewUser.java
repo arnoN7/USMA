@@ -1,8 +1,8 @@
 package example.com.usma;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -14,7 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -39,41 +38,30 @@ import java.util.Locale;
  * create an instance of this fragment.
  */
 public class NewUser extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
     private EditText inputName, inputEmail, inputFirstname, inputLicence;
     private TextInputLayout inputLayoutName, inputLayoutFirstname, inputLayoutEmail,
-            inputLayoutLicence;
+            inputLayoutLicence, inputLayoutBirthdate;
     private Button saveButton;
 
     private OnFragmentInteractionListener mListener;
     private DatePickerDialog datePickerDialog;
-    private EditText birthDateText;
+    private EditText inputBirthdate;
     private Date birthDate;
     private SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.FRANCE);
     private ParseUser currentUser;
+    private String oldTitle;
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment NewUser.
      */
     // TODO: Rename and change types and number of parameters
-    public static NewUser newInstance(String param1, String param2) {
+    public static NewUser newInstance() {
         NewUser fragment = new NewUser();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -82,12 +70,14 @@ public class NewUser extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        ((MainActivity)getActivity()).hideFab(false);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
         setHasOptionsMenu(true);
     }
 
@@ -100,12 +90,17 @@ public class NewUser extends Fragment {
         inputLayoutFirstname = (TextInputLayout) view.findViewById(R.id.input_layout_firstname);
         inputLayoutEmail = (TextInputLayout) view.findViewById(R.id.input_layout_email);
         inputLayoutLicence = (TextInputLayout) view.findViewById(R.id.input_layout_licence);
+        inputLayoutBirthdate = (TextInputLayout) view.findViewById(R.id.input_layout_birth_date);
 
         inputName = (EditText) view.findViewById(R.id.input_name);
         inputFirstname = (EditText) view.findViewById(R.id.input_firstname);
         inputEmail = (EditText) view.findViewById(R.id.input_email);
         inputLicence = (EditText) view.findViewById(R.id.input_licence);
-        birthDateText = (EditText) view.findViewById(R.id.input_birth_date);
+        inputBirthdate = (EditText) view.findViewById(R.id.input_birth_date);
+        ((MainActivity)getActivity()).hideFab(true);
+        oldTitle = ((MainActivity)getActivity()).getCollapsingToolbarLayout().getTitle().toString();
+        ((MainActivity)getActivity()).getCollapsingToolbarLayout().
+                setTitle(getString(R.string.new_user));
 
         saveButton = (Button) view.findViewById(R.id.save_user);
         setDateFields();
@@ -117,11 +112,12 @@ public class NewUser extends Fragment {
             }
         });
 
+
         return view;
 
     }
     private void setDateFields(){
-        birthDateText.setOnClickListener(new View.OnClickListener() {
+        inputBirthdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 datePickerDialog.show();
@@ -135,7 +131,7 @@ public class NewUser extends Fragment {
                 Calendar newDate = Calendar.getInstance();
                 newDate.set(year, monthOfYear, dayOfMonth);
                 birthDate = newDate.getTime();
-                birthDateText.setText(dateFormatter.format(newDate.getTime()));
+                inputBirthdate.setText(dateFormatter.format(newDate.getTime()));
             }
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
     }
@@ -155,6 +151,10 @@ public class NewUser extends Fragment {
         if (!validateLicence()) {
             return;
         }
+
+        if (!validateBirthdate()) {
+            return;
+        }
         final ParseUser newUser = new ParseUser();
         currentUser = ParseUser.getCurrentUser();
         newUser.setUsername(inputEmail.getText().toString());
@@ -169,53 +169,61 @@ public class NewUser extends Fragment {
             public void done(ParseException e) {
                 ParseUser.logInInBackground(currentUser.getUsername(),
                         currentUser.get(User.LICENCE).toString());
+                closeNewUser();
                 Toast.makeText(getActivity().getApplicationContext(),
                         newUser.getString(User.FIRSTNAME) + " " +
-                        newUser.getString(User.NAME) + " " + getString(R.string.user_added),
+                        newUser.getString(User.NAME) + " " + getString(R.string.added),
                         Toast.LENGTH_SHORT).show();
-                FragmentManager fm = getActivity().getFragmentManager();
-                fm.popBackStack();
                 ((ListFragmentUsers)((MainActivity)getActivity()).getCurrentFragment()).
                         addUser(newUser);
 
             }
         });
-
-
-
     }
 
     private boolean validateName() {
         if (inputName.getText().toString().trim().isEmpty()) {
             inputLayoutName.setError(getString(R.string.err_msg_name));
-            requestFocus(inputName);
+            USMAApplication.requestFocus(inputName, getActivity());
             return false;
         } else {
             inputLayoutName.setErrorEnabled(false);
+        }
+
+        return true;
+    }
+
+    private boolean validateBirthdate() {
+        if (inputBirthdate.getText().toString().trim().isEmpty()) {
+            inputLayoutBirthdate.setError(getString(R.string.err_msg_birthdate));
+            USMAApplication.requestFocus(inputBirthdate, getActivity());
+            return false;
+        } else {
+            inputLayoutBirthdate.setErrorEnabled(false);
         }
 
         return true;
     }
 
     private boolean validateFirstname() {
-        if (inputName.getText().toString().trim().isEmpty()) {
-            inputLayoutName.setError(getString(R.string.err_msg_firstname));
-            requestFocus(inputName);
+        if (inputFirstname.getText().toString().trim().isEmpty()) {
+            inputLayoutFirstname.setError(getString(R.string.err_msg_firstname));
+            USMAApplication.requestFocus(inputFirstname, getActivity());
             return false;
         } else {
-            inputLayoutName.setErrorEnabled(false);
+            inputLayoutFirstname.setErrorEnabled(false);
         }
 
         return true;
     }
 
     private boolean validateLicence() {
-        if (inputName.getText().toString().trim().isEmpty()) {
-            inputLayoutName.setError(getString(R.string.err_msg_licence));
-            requestFocus(inputName);
+        if (inputLicence.getText().toString().trim().isEmpty()) {
+            inputLayoutLicence.setError(getString(R.string.err_msg_licence));
+            USMAApplication.requestFocus(inputLicence, getActivity());
             return false;
         } else {
-            inputLayoutName.setErrorEnabled(false);
+            inputLayoutLicence.setErrorEnabled(false);
         }
 
         return true;
@@ -226,7 +234,7 @@ public class NewUser extends Fragment {
 
         if (email.isEmpty() || !isValidEmail(email)) {
             inputLayoutEmail.setError(getString(R.string.err_msg_email));
-            requestFocus(inputEmail);
+            USMAApplication.requestFocus(inputEmail, getActivity());
             return false;
         } else {
             inputLayoutEmail.setErrorEnabled(false);
@@ -245,26 +253,27 @@ public class NewUser extends Fragment {
         }
     }
 
-    private void requestFocus(View view) {
-        if (view.requestFocus()) {
-            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.new_user, menu);
+        inflater.inflate(R.menu.new_toolbar, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
-    public void onAttach(Context activity) {
-        super.onAttach(activity);
+    public void onAttach(Activity context) {
+        super.onAttach(context);
+        try {
+            mListener = (OnFragmentInteractionListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
     public void onDetach() {
+        //// TODO: 02/11/2015  
         super.onDetach();
         mListener = null;
     }
@@ -289,12 +298,17 @@ public class NewUser extends Fragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.action_cancel:
-                FragmentManager fm = getActivity().getFragmentManager();
-                fm.popBackStack();
+                closeNewUser();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void closeNewUser() {
+        FragmentManager fm = getActivity().getFragmentManager();
+        fm.popBackStack();
+        ((MainActivity)getActivity()).getCollapsingToolbarLayout().setTitle(oldTitle);
     }
 
 }

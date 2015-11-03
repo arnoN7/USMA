@@ -13,7 +13,7 @@ public class ListFragmentLicence extends ListFragment {
     }
 
     @Override
-    public void newItem() {
+    public void newItemAction() {
         //TODO
     }
 }

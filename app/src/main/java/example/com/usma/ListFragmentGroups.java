@@ -21,7 +21,7 @@ public class ListFragmentGroups extends ListFragment {
     }
 
     @Override
-    public void newItem() {
+    public void newItemAction() {
         //update the main content by replacing fragments
         final Fragment fragment = new NewGroup();
         FragmentManager fragmentManager = getFragmentManager();
@@ -39,11 +39,30 @@ public class ListFragmentGroups extends ListFragment {
     public void setGroups(List<ParseRole> groups) {
         this.groups = groups;
         List<Item> items = new ArrayList<>();
-        for (ParseRole group:groups
-                ) {
-            items.add(new Item(NavigationMenu.GROUPS, group.getString(GroupUsers.NAME),
-                    group.getString(GroupUsers.DESCRIPTION)));
+        if(groups != null){
+            for (ParseRole group : groups
+                    ) {
+                items.add(new Item(NavigationMenu.GROUPS, group.getString(GroupUsers.NAME),
+                        group.getString(GroupUsers.DESCRIPTION)));
+            }
         }
         super.setItems(items);
+    }
+
+    public ParseRole getAdminRole() {
+        ParseRole adminRole = null;
+        if(groups != null) {
+            for (ParseRole role : groups) {
+                if (role.getName() == GroupUsers.ADMIN) {
+                    return adminRole;
+                }
+            }
+        }
+        return adminRole;
+    }
+    public void addGroup(ParseRole newGroup) {
+        groups.add(newGroup);
+        super.addItem(new Item(NavigationMenu.GROUPS, newGroup.getName(),
+                newGroup.getString(GroupUsers.DESCRIPTION)));
     }
 }

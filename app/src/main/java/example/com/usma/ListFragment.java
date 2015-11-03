@@ -89,7 +89,7 @@ public abstract class ListFragment extends Fragment {
         mListener = null;
     }
 
-    public abstract void newItem();
+    public abstract void newItemAction();
 
     /**
      * This interface must be implemented by activities that contain this
