@@ -16,8 +16,23 @@ import java.util.List;
 public class ListFragmentGroups extends ListFragment {
     private List<ParseRole> groups;
 
+
     public ListFragmentGroups () {
 
+    }
+
+    @Override
+    protected List<Item> getItems() {
+        List<Item> items = new ArrayList<>();
+        groups = ((MainActivity)getActivity()).getGroups();
+        if(groups != null){
+            for (ParseRole group : groups
+                    ) {
+                items.add(new Item(NavigationMenu.GROUPS, group.getString(GroupUsers.NAME),
+                        group.getString(GroupUsers.DESCRIPTION)));
+            }
+        }
+        return items;
     }
 
     @Override
@@ -34,19 +49,6 @@ public class ListFragmentGroups extends ListFragment {
     public static ListFragmentGroups newInstance() {
         ListFragmentGroups fragment = new ListFragmentGroups();
         return fragment;
-    }
-
-    public void setGroups(List<ParseRole> groups) {
-        this.groups = groups;
-        List<Item> items = new ArrayList<>();
-        if(groups != null){
-            for (ParseRole group : groups
-                    ) {
-                items.add(new Item(NavigationMenu.GROUPS, group.getString(GroupUsers.NAME),
-                        group.getString(GroupUsers.DESCRIPTION)));
-            }
-        }
-        super.setItems(items);
     }
 
     public ParseRole getAdminRole() {

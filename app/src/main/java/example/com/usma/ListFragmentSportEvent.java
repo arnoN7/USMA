@@ -12,20 +12,42 @@ import java.util.List;
  */
 public class ListFragmentSportEvent extends ListFragment{
 
-    private static final String ARG_SPORT_EVENT_TYPE = "sportEventType";
-    private List<SportEvent> trainings;
-    private NavigationMenu sportEventType;
+    private List<SportEvent> sportEvents;
+    private NavigationMenu sportEventsType;
 
     public static ListFragmentSportEvent newInstance(NavigationMenu sportEventType) {
         ListFragmentSportEvent fragment = new ListFragmentSportEvent();
-        fragment.sportEventType = sportEventType;
+        fragment.sportEventsType = sportEventType;
         return fragment;
+    }
+
+    @Override
+    protected List<Item> getItems() {
+        List<Item> items = new ArrayList<>();
+        if(sportEventsType == NavigationMenu.TRAINING) {
+            sportEvents = ((MainActivity)getActivity()).getTrainings();
+        } else if (sportEventsType == NavigationMenu.RACES) {
+            sportEvents = ((MainActivity)getActivity()).getRaces();
+        } else {
+            //should not append
+            return null;
+        }
+
+        if(sportEventsType != null) {
+            for (SportEvent sportEvent : sportEvents
+                    ) {
+                Item item = new Item(sportEventsType, sportEvent.getName(),
+                        sportEvent.getDescription());
+                items.add(item);
+            }
+        }
+        return items;
     }
 
     @Override
     public void newItemAction() {
         //update the main content by replacing fragments
-        final Fragment fragment = NewTraining.newInstance(sportEventType);
+        final Fragment fragment = NewSportEvent.newInstance(sportEventsType);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.content_frame, fragment);
@@ -33,24 +55,10 @@ public class ListFragmentSportEvent extends ListFragment{
         ft.commit();
     }
 
-    public void setSportEvents(List<SportEvent> sportEvents) {
-        this.trainings = sportEvents;
-        List<Item> items = new ArrayList<>();
-        if(sportEvents != null) {
-            for (SportEvent training : sportEvents
-                    ) {
-                Item item = new Item(NavigationMenu.TRAINING, training.getName(),
-                        training.getDescription());
-                items.add(item);
-            }
-        }
-        super.setItems(items);
-    }
-
     public void addSportEvent(SportEvent newTraining, NavigationMenu navigationMenu) {
         if(navigationMenu == NavigationMenu.RACES ||
                 navigationMenu == NavigationMenu.TRAINING) {
-            trainings.add(newTraining);
+            sportEvents.add(newTraining);
             super.addItem(new Item(navigationMenu, newTraining.getName(),
                     newTraining.getDescription()));
         }

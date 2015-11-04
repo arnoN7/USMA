@@ -32,12 +32,12 @@ import java.util.Locale;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link NewTraining.OnFragmentInteractionListener} interface
+ * {@link NewSportEvent.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link NewTraining#newInstance} factory method to
+ * Use the {@link NewSportEvent#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NewTraining extends Fragment {
+public class NewSportEvent extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private TextInputLayout inputLayoutTrainingName, inputLayoutTrainingDate;
@@ -58,14 +58,14 @@ public class NewTraining extends Fragment {
      * @return A new instance of fragment NewTraining.
      */
     // TODO: Rename and change types and number of parameters
-    public static NewTraining newInstance(NavigationMenu sportEventType) {
-        NewTraining fragment = new NewTraining();
+    public static NewSportEvent newInstance(NavigationMenu sportEventType) {
+        NewSportEvent fragment = new NewSportEvent();
         fragment.sportEventType = sportEventType;
 
         return fragment;
     }
 
-    public NewTraining() {
+    public NewSportEvent() {
         // Required empty public constructor
     }
 
@@ -79,7 +79,7 @@ public class NewTraining extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =inflater.inflate(R.layout.fragment_new_training, container, false);
+        View view =inflater.inflate(R.layout.fragment_sport_event, container, false);
         inputSportType = (Spinner) view.findViewById(R.id.sports_type);
         sportEventTypes = getResources().getStringArray(R.array.array_training_type);
         // Create an ArrayAdapter using the string array and a default spinner layout

@@ -24,6 +24,19 @@ public class ListFragmentUsers  extends ListFragment{
 
     }
 
+    @Override
+    protected List<Item> getItems() {
+        users = ((MainActivity) getActivity()).getUsers();
+        List<Item> items = new ArrayList<>();
+        if (users != null) {
+            for (ParseUser user : users
+                    ) {
+                items.add(new Item(NavigationMenu.USERS, user.get(User.FIRSTNAME) + " " +
+                        user.get(User.NAME), user.getEmail()));
+            }
+        }
+        return items;
+    }
 
 
     public static ListFragmentUsers newInstance() {
@@ -31,19 +44,6 @@ public class ListFragmentUsers  extends ListFragment{
         return fragment;
     }
 
-    public void setUsers(List<ParseUser> users) {
-        this.users = users;
-        List<Item> items = new ArrayList<>();
-        if(users != null) {
-            for (ParseUser user : users
-                    ) {
-                items.add(new Item(NavigationMenu.USERS, user.get(User.FIRSTNAME) + " " +
-                        user.get(User.NAME), user.getEmail()));
-            }
-        }
-        super.setItems(items);
-
-    }
     @Override
     public void newItemAction() {
         // update the main content by replacing fragments

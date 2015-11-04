@@ -24,9 +24,6 @@ import java.util.List;
 public abstract class ListFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    private NavigationMenu menu;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
@@ -41,8 +38,8 @@ public abstract class ListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
+        // Retain this fragment across configuration changes.
+        setRetainInstance(true);
     }
 
     @Override
@@ -60,10 +57,11 @@ public abstract class ListFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new ListItemAdapter(items);
-        mRecyclerView.setAdapter(mAdapter);
+        notifyDataSetChanged();
         return rootView;
     }
+
+    protected abstract List<Item> getItems();
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -106,16 +104,14 @@ public abstract class ListFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
-    public void setMenu(NavigationMenu menu) {
-        this.menu = menu;
-    }
-
-    public void setItems(List<Item> items) {
-        this.items = items;
-    }
-
     public void addItem (Item newItem) {
         items.add(newItem);
         mAdapter.notifyDataSetChanged();
+    }
+
+    public void notifyDataSetChanged() {
+        items = getItems();
+        mAdapter = new ListItemAdapter(items);
+        mRecyclerView.setAdapter(mAdapter);
     }
 }
