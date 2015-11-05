@@ -39,23 +39,24 @@ public class MainActivity extends AppCompatActivity implements
     private static final String LIST_FRAGMENT_RACE = "ListFragmentRace";
     private static final String LIST_FRAGMENT_TRAINING = "ListFragmentTraining";
     private static final String LIST_FRAGMENT_LICENCE = "ListFragmentLicence";
+    public static final String LIST_FRAGMENT_NEW_USER = "ListFragmentNewUser";
+    public static final String LIST_FRAGMENT_NEW_GROUP = "ListFragmentNewGroup";
+    public static final String LIST_FRAGMENT_NEW_TRAINING = "ListFragmentNewTraining";
+    public static final String LIST_FRAGMENT_NEW_RACE = "ListFragmentNewTraining";
+    private static final String LIST_FRAGMENT_NO_TAG = "noTag";
 
-    private static final String CURRENT_POSITION_DRAWER = "currentPositionDrawer";
+    private static final String CURRENT_FRAGMENT_TAG = "currentFragmentTag";
+    private static final String CURRENT_TITLE_TAG = "currentTitleTag";
 
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
     public NavigationMenu[] navigationMenu = {NavigationMenu.RACES, NavigationMenu.TRAINING,
             NavigationMenu.GROUPS, NavigationMenu.LICENCE, NavigationMenu.USERS};
     private List<Fragment> fragments;
-    private ListFragment currentFragment;
-    private int currentPosition;
+    private String currentFragmentTag;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private ParseRole adminRole;
 
-    private List<ParseUser> users;
-    private List<ParseRole> groups;
-    private List<SportEvent> trainings;
-    private List<SportEvent> races;
 
     //Similarly we Create a String Resource for the name and email in the header view
     //And we also create a int resource for profile picture in the header view
@@ -74,15 +75,15 @@ public class MainActivity extends AppCompatActivity implements
     FloatingActionButton buttonNew;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if((savedInstanceState != null) && savedInstanceState.containsKey(CURRENT_POSITION_DRAWER)){
-            currentPosition = savedInstanceState.getInt(CURRENT_POSITION_DRAWER);
+        if((savedInstanceState != null) &&
+                savedInstanceState.containsKey(CURRENT_FRAGMENT_TAG)){
+            currentFragmentTag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG);
+
         } else {
-            currentPosition = NavigationMenu.RACES.getId() +1;
+            currentFragmentTag = LIST_FRAGMENT_NO_TAG;
         }
 
         adminRole = null;
@@ -137,22 +138,24 @@ public class MainActivity extends AppCompatActivity implements
                 super.onDrawerClosed(drawerView);
                 // Code here will execute once drawer is closed
             }
-
-
-
         }; // Drawer Toggle Object Made
         Drawer.setDrawerListener(mDrawerToggle); // Drawer Listener set to the Drawer toggle
         mDrawerToggle.syncState();               // Finally we set the drawer toggle sync State
 
-        users = new ArrayList<>();
-        groups = new ArrayList<>();
-        trainings = new ArrayList<>();
-        races = new ArrayList<>();
-
-        initFragments();
-        //+1 is added because of the header in the navigation drawer
-        selectItem(currentPosition);
-
+        if(currentFragmentTag != LIST_FRAGMENT_NO_TAG) {
+            FragmentManager fragmentManager = getFragmentManager();
+            Fragment currentFragment = fragmentManager.findFragmentByTag(currentFragmentTag);
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.content_frame, currentFragment, currentFragmentTag);
+            ft.commit();
+            String title = savedInstanceState.getString(CURRENT_TITLE_TAG);
+            collapsingToolbarLayout.setTitle(title);
+            initFragmentsFromLocalDataStore();
+        } else {
+            initFragments();
+            selectItem(NavigationMenu.RACES.getId()+1);
+        }
+        initNewButton();
     }
 
 
@@ -180,38 +183,30 @@ public class MainActivity extends AppCompatActivity implements
     public void selectItem(int position) {
         // update the main content by replacing fragments
         if(position != 0 || position <= fragments.size()) {
-            String tag = null;
-            currentPosition = position;
-            if(NavigationMenu.RACES.getId() - 1 == position) {
-                tag = LIST_FRAGMENT_RACE;
-            } else if (NavigationMenu.TRAINING.getId() -1 == position) {
-                tag = LIST_FRAGMENT_TRAINING;
-            } else if (NavigationMenu.GROUPS.getId() - 1 == position) {
-                tag = LIST_FRAGMENT_GROUPS;
-            } else if (NavigationMenu.LICENCE.getId() -1 == position) {
-                tag = LIST_FRAGMENT_LICENCE;
-            } else if (NavigationMenu.USERS.getId() - 1 == position) {
-                tag = LIST_FRAGMENT_USER;
+            if(NavigationMenu.RACES.getId() + 1 == position) {
+                setCurrentFragmentTag(LIST_FRAGMENT_RACE);
+            } else if (NavigationMenu.TRAINING.getId() + 1 == position) {
+                setCurrentFragmentTag(LIST_FRAGMENT_TRAINING);
+            } else if (NavigationMenu.GROUPS.getId() + 1 == position) {
+                setCurrentFragmentTag(LIST_FRAGMENT_GROUPS);
+            } else if (NavigationMenu.LICENCE.getId() + 1 == position) {
+                setCurrentFragmentTag(LIST_FRAGMENT_LICENCE);
+            } else if (NavigationMenu.USERS.getId() + 1 == position) {
+                setCurrentFragmentTag(LIST_FRAGMENT_USER);
             }
 
             FragmentManager fragmentManager = getFragmentManager();
-            currentFragment = (ListFragment) fragmentManager.findFragmentByTag(tag);
+            Fragment currentFragment = fragmentManager.findFragmentByTag(currentFragmentTag);
             if(currentFragment == null) {
                 //If selected fragment was never used retreived loaded fragment
-                currentFragment = (ListFragment) fragments.get(position - 1);
+                currentFragment = fragments.get(position - 1);
             }
 
-
             FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(R.id.content_frame, currentFragment);
-            ft.addToBackStack(tag);
+            ft.replace(R.id.content_frame, currentFragment, currentFragmentTag);
             ft.commit();
-            buttonNew.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    currentFragment.newItemAction();
-                }
-            });
+            initNewButton();
+
         }
         // update selected item title, then close the drawer
         collapsingToolbarLayout.setTitle(getString(navigationMenu[position-1].getNameID()));
@@ -223,30 +218,102 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void setUsers(List<ParseUser> users) {
-        this.users = users;
-        if(fragments.get(NavigationMenu.USERS.getId()).equals(currentFragment)) {
+        ParseUser.pinAllInBackground(users);
+        if(currentFragmentTag.equals(LIST_FRAGMENT_USER)) {
             ((ListFragment) fragments.get(NavigationMenu.USERS.getId())).notifyDataSetChanged();
         }
     }
 
     public void setGroups(List<ParseRole> groups) {
-        this.groups = groups;
-        if (fragments.get(NavigationMenu.GROUPS.getId()).equals(currentFragment)) {
+        ParseRole.pinAllInBackground(groups);
+        if (currentFragmentTag.equals(LIST_FRAGMENT_GROUPS)) {
             ((ListFragment) fragments.get(NavigationMenu.GROUPS.getId())).notifyDataSetChanged();
         }
     }
 
     public void setTrainings(List<SportEvent> trainings) {
-        this.trainings = trainings;
-        if (fragments.get(NavigationMenu.TRAINING.getId()).equals(currentFragment)) {
+        SportEvent.pinAllInBackground(trainings);
+        if (currentFragmentTag.equals(LIST_FRAGMENT_TRAINING)) {
             ((ListFragment) fragments.get(NavigationMenu.TRAINING.getId())).notifyDataSetChanged();
         }
     }
 
     public void setRaces(List<SportEvent> races) {
-        this.races = races;
-        if (fragments.get(NavigationMenu.RACES.getId()).equals(currentFragment)) {
+        SportEvent.pinAllInBackground(races);
+        if (currentFragmentTag.equals(LIST_FRAGMENT_RACE)) {
             ((ListFragment) fragments.get(NavigationMenu.RACES.getId())).notifyDataSetChanged();
+        }
+    }
+
+    private void initFragmentsFromLocalDataStore() {
+        fragments = new ArrayList<>();
+        for (int i = 0; i < navigationMenu.length; i++) {
+            switch (navigationMenu[i]) {
+                case USERS:
+                    ParseQuery<ParseUser> queryUsers = ParseUser.getQuery();
+                    queryUsers.fromLocalDatastore();
+                    try {
+                        Fragment fragment = getLocalFragmentByTag(LIST_FRAGMENT_USER);
+                        if(fragment == null) {
+                            fragment = ListFragmentUsers.newInstance();
+                        }
+                        fragments.add(fragment);
+                        setUsers(queryUsers.find());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case GROUPS:
+                    ParseQuery<ParseRole> queryGroups = ParseRole.getQuery();
+                    queryGroups.fromLocalDatastore();
+                    try {
+                        Fragment fragment = getLocalFragmentByTag(LIST_FRAGMENT_GROUPS);
+                        if(fragment == null) {
+                            fragment = ListFragmentGroups.newInstance();
+                        }
+                        fragments.add(fragment);
+                        setGroups(queryGroups.find());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case RACES:
+                case TRAINING:
+                    ParseQuery<SportEvent> querySportEvent = ParseQuery.getQuery(SportEvent.class);
+                    querySportEvent.whereEqualTo(SportEvent.MENU_TYPE,
+                            getString(navigationMenu[i].getNameID()));
+                    querySportEvent.orderByDescending(SportEvent.DATE);
+                    querySportEvent.fromLocalDatastore();
+                    try {
+                        Fragment fragment = null;
+                        if(navigationMenu[i] == NavigationMenu.RACES) {
+                            fragment = getLocalFragmentByTag(LIST_FRAGMENT_RACE);
+                            if(fragment == null) {
+                                fragment = ListFragmentSportEvent.newInstance(navigationMenu[i]);
+                            }
+                            fragments.add(fragment);
+                            setRaces(querySportEvent.find());
+                        } else {
+                            fragment = getLocalFragmentByTag(LIST_FRAGMENT_TRAINING);
+                            if(fragment == null) {
+                                fragment = ListFragmentSportEvent.newInstance(navigationMenu[i]);
+                            }
+                            fragments.add(fragment);
+                            setTrainings(querySportEvent.find());
+                        }
+
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
+                case LICENCE:
+                    ListFragmentLicence fragmentLicence = ListFragmentLicence.newInstance();
+                    fragments.add(fragmentLicence);
+                    break;
+
+            }
         }
     }
 
@@ -259,9 +326,13 @@ public class MainActivity extends AppCompatActivity implements
                     queryUsers.findInBackground(new FindCallback<ParseUser>() {
                         @Override
                         public void done(List<ParseUser> objects, ParseException e) {
-                            Toast debug = Toast.makeText(getApplication(), "Users Loaded", Toast.LENGTH_LONG);
-                            debug.show();
-                            setUsers(objects);
+                            if (e == null) {
+                                Toast debug = Toast.makeText(getApplication(), "Users Loaded", Toast.LENGTH_LONG);
+                                debug.show();
+                                setUsers(objects);
+                            } else {
+
+                            }
                         }
                     });
                     ListFragmentUsers fragment = ListFragmentUsers.newInstance();
@@ -326,12 +397,22 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putInt(CURRENT_POSITION_DRAWER, currentPosition);
+        outState.putString(CURRENT_FRAGMENT_TAG, currentFragmentTag);
+        outState.putString(CURRENT_TITLE_TAG, collapsingToolbarLayout.getTitle().toString());
         super.onSaveInstanceState(outState);
     }
 
-    public ListFragment getCurrentFragment() {
-        return currentFragment;
+    public Fragment getCurrentFragment() {
+        return getLocalFragmentByTag(currentFragmentTag);
+    }
+
+    public Fragment getLocalFragmentByTag(String tag) {
+        FragmentManager fragmentManager = getFragmentManager();
+        return fragmentManager.findFragmentByTag(tag);
+    }
+
+    public void setCurrentFragmentTag(String currentFragmentTag) {
+        this.currentFragmentTag = currentFragmentTag;
     }
 
     @Override
@@ -348,7 +429,6 @@ public class MainActivity extends AppCompatActivity implements
     public void hideFab(boolean hide) {
         CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams)    buttonNew.getLayoutParams();
         if (hide) {
-
             buttonNew.setVisibility(View.GONE);
         }
         else {
@@ -358,23 +438,80 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+
     public CollapsingToolbarLayout getCollapsingToolbarLayout() {
         return collapsingToolbarLayout;
     }
 
+    /**
+     * Get Users from local datastore
+     * @return
+     */
     public List<ParseUser> getUsers() {
+        ParseQuery<ParseUser> queryUsers = ParseUser.getQuery();
+        List<ParseUser> users = null;
+        try {
+            users = queryUsers.fromLocalDatastore().find();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         return users;
     }
 
+    /**
+     * Get Roles from local datastore
+     * @return
+     */
     public List<ParseRole> getGroups() {
+        ParseQuery<ParseRole> queryGroups = ParseRole.getQuery();
+        List<ParseRole> groups = null;
+        try {
+            groups = queryGroups.fromLocalDatastore().find();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         return groups;
     }
 
-    public List<SportEvent> getTrainings() {
-        return trainings;
+    /**
+     * Get Sport Events from local datastore
+     * @return
+     */
+    public List<SportEvent> getSportEvent(NavigationMenu sportType) {
+        ParseQuery<SportEvent> querySportEvent = ParseQuery.getQuery(SportEvent.class);
+        querySportEvent.whereEqualTo(SportEvent.MENU_TYPE,
+                getString(sportType.getNameID()));
+        querySportEvent.orderByDescending(SportEvent.DATE);
+        querySportEvent.fromLocalDatastore();
+        List<SportEvent> sportEvents = null;
+        try {
+            sportEvents = querySportEvent.find();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return sportEvents;
     }
 
-    public List<SportEvent> getRaces() {
-        return races;
+    public void initNewButton() {
+        if(currentFragmentTag == LIST_FRAGMENT_RACE ||
+                currentFragmentTag == LIST_FRAGMENT_TRAINING ||
+                currentFragmentTag == LIST_FRAGMENT_USER ||
+                currentFragmentTag == LIST_FRAGMENT_GROUPS) {
+            hideFab(false);
+            Fragment currentFragment = getCurrentFragment();
+            buttonNew.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((ListFragment)getCurrentFragment()).newItemAction();
+                }
+            });
+
+        } else {
+            hideFab(true);
+        }
+    }
+
+    public String getCurrentFragmentTag() {
+        return currentFragmentTag;
     }
 }

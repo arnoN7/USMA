@@ -32,14 +32,11 @@ import com.parse.SaveCallback;
  */
 public class NewGroup extends Fragment {
 
-
     private OnFragmentInteractionListener mListener;
     private TextInputLayout inputLayoutGroupName, inputLayoutGroupDescription;
     private EditText inputGroupName, inputGroupDescription;
     private Button saveButton;
     private ParseRole adminRole;
-
-    private String oldTitle;
 
     /**
      * Use this factory method to create a new instance of
@@ -61,6 +58,7 @@ public class NewGroup extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
     }
 
     @Override
@@ -86,7 +84,6 @@ public class NewGroup extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_new_group, container, false);
         inputLayoutGroupName = (TextInputLayout) view.findViewById(R.id.input_layout_group_name);
         inputLayoutGroupDescription = (TextInputLayout) view.
@@ -95,7 +92,6 @@ public class NewGroup extends Fragment {
         inputGroupName = (EditText) view.findViewById(R.id.input_group_name);
         inputGroupDescription = (EditText) view.findViewById(R.id.input_group_description);
         ((MainActivity)getActivity()).hideFab(true);
-        oldTitle = ((MainActivity)getActivity()).getCollapsingToolbarLayout().getTitle().toString();
         ((MainActivity)getActivity()).getCollapsingToolbarLayout().
                 setTitle(getString(R.string.new_group));
 
@@ -133,8 +129,8 @@ public class NewGroup extends Fragment {
 
     private void closeNewGroup() {
         FragmentManager fm = getActivity().getFragmentManager();
-        fm.popBackStack();
-        ((MainActivity)getActivity()).getCollapsingToolbarLayout().setTitle(oldTitle);
+        fm.beginTransaction().remove(this).commit();
+        ((MainActivity)getActivity()).selectItem(NavigationMenu.GROUPS.getId() + 1);
     }
 
     private boolean validateGroupName() {

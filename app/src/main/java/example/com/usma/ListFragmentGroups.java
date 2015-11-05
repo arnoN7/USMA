@@ -41,8 +41,8 @@ public class ListFragmentGroups extends ListFragment {
         final Fragment fragment = new NewGroup();
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
-        ft.replace(R.id.content_frame, fragment);
-        ft.addToBackStack("tag");
+        ft.replace(R.id.content_frame, fragment, MainActivity.LIST_FRAGMENT_NEW_GROUP);
+        ((MainActivity)getActivity()).setCurrentFragmentTag(MainActivity.LIST_FRAGMENT_NEW_GROUP);
         ft.commit();
     }
 

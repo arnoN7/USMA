@@ -24,15 +24,7 @@ public class ListFragmentSportEvent extends ListFragment{
     @Override
     protected List<Item> getItems() {
         List<Item> items = new ArrayList<>();
-        if(sportEventsType == NavigationMenu.TRAINING) {
-            sportEvents = ((MainActivity)getActivity()).getTrainings();
-        } else if (sportEventsType == NavigationMenu.RACES) {
-            sportEvents = ((MainActivity)getActivity()).getRaces();
-        } else {
-            //should not append
-            return null;
-        }
-
+        sportEvents = ((MainActivity)getActivity()).getSportEvent(sportEventsType);
         if(sportEventsType != null) {
             for (SportEvent sportEvent : sportEvents
                     ) {
@@ -50,8 +42,14 @@ public class ListFragmentSportEvent extends ListFragment{
         final Fragment fragment = NewSportEvent.newInstance(sportEventsType);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
-        ft.replace(R.id.content_frame, fragment);
-        ft.addToBackStack("tag");
+        if(sportEventsType == NavigationMenu.RACES) {
+            ft.replace(R.id.content_frame, fragment, MainActivity.LIST_FRAGMENT_NEW_RACE);
+            ((MainActivity)getActivity()).setCurrentFragmentTag(MainActivity.LIST_FRAGMENT_NEW_RACE);
+        } else if (sportEventsType == NavigationMenu.TRAINING) {
+            ft.replace(R.id.content_frame, fragment, MainActivity.LIST_FRAGMENT_NEW_TRAINING);
+            ((MainActivity)getActivity()).setCurrentFragmentTag(MainActivity.
+                    LIST_FRAGMENT_NEW_TRAINING);
+        }
         ft.commit();
     }
 

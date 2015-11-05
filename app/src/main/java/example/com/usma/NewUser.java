@@ -50,7 +50,6 @@ public class NewUser extends Fragment {
     private Date birthDate;
     private SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.FRANCE);
     private ParseUser currentUser;
-    private String oldTitle;
 
     /**
      * Use this factory method to create a new instance of
@@ -79,12 +78,12 @@ public class NewUser extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_new_user, container, false);
         inputLayoutName = (TextInputLayout) view.findViewById(R.id.input_layout_name);
         inputLayoutFirstname = (TextInputLayout) view.findViewById(R.id.input_layout_firstname);
@@ -98,7 +97,6 @@ public class NewUser extends Fragment {
         inputLicence = (EditText) view.findViewById(R.id.input_licence);
         inputBirthdate = (EditText) view.findViewById(R.id.input_birth_date);
         ((MainActivity)getActivity()).hideFab(true);
-        oldTitle = ((MainActivity)getActivity()).getCollapsingToolbarLayout().getTitle().toString();
         ((MainActivity)getActivity()).getCollapsingToolbarLayout().
                 setTitle(getString(R.string.new_user));
 
@@ -307,8 +305,8 @@ public class NewUser extends Fragment {
 
     public void closeNewUser() {
         FragmentManager fm = getActivity().getFragmentManager();
-        fm.popBackStack();
-        ((MainActivity)getActivity()).getCollapsingToolbarLayout().setTitle(oldTitle);
+        fm.beginTransaction().remove(this).commit();
+        ((MainActivity)getActivity()).selectItem(NavigationMenu.USERS.getId() + 1);
     }
 
 }

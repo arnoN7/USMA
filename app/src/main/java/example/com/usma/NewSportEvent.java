@@ -49,7 +49,6 @@ public class NewSportEvent extends Fragment {
     private DatePickerDialog datePickerDialog;
     private Date trainingDate;
     private SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.FRANCE);
-    private String oldTitle;
     private NavigationMenu sportEventType;
 
     /**
@@ -73,6 +72,12 @@ public class NewSportEvent extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -104,7 +109,6 @@ public class NewSportEvent extends Fragment {
                 submitForm();
             }
         });
-        oldTitle = ((MainActivity)getActivity()).getCollapsingToolbarLayout().getTitle().toString();
         ((MainActivity)getActivity()).getCollapsingToolbarLayout().
                 setTitle(getString(R.string.new_training));
         trainingDate = null;
@@ -188,9 +192,9 @@ public class NewSportEvent extends Fragment {
     }
 
     private void closeNewTraining() {
-        FragmentManager fm = getActivity().getFragmentManager();
-        fm.popBackStack();
-        ((MainActivity)getActivity()).getCollapsingToolbarLayout().setTitle(oldTitle);
+        //FragmentManager fm = getActivity().getFragmentManager();
+        //fm.beginTransaction().remove(this).commit();
+        ((MainActivity)getActivity()).selectItem(sportEventType.getId() + 1);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
