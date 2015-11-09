@@ -45,7 +45,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
 
 
-        public ViewHolder(View itemView,int ViewType, final Context context) {                 // Creating ViewHolder Constructor with View and viewType As a parameter
+        public ViewHolder(View itemView, int ViewType, final Context context) {                 // Creating ViewHolder Constructor with View and viewType As a parameter
             super(itemView);
             this.context = context;
             itemView.setClickable(true);

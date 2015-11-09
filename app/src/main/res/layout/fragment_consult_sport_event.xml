@@ -1,0 +1,115 @@
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" tools:context="example.com.usma.ConsultSportEvent">
+
+    <RelativeLayout android:layout_width="match_parent" android:layout_height="match_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/sport_event_name"
+            android:layout_alignParentTop="true"
+            android:textStyle="bold"
+            android:textColor="@color/USMABlue"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/sport_event_description"
+            android:layout_below="@id/sport_event_name"
+            android:textColor="@color/USMAAccent"
+            android:textStyle="italic"/>
+        <!-- A CardView that contains a TextView -->
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card_view"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/day_of_week_event"
+            android:layout_marginLeft="@dimen/padding_medium"
+            android:layout_marginRight="@dimen/padding_medium"
+            android:paddingTop="@dimen/padding_medium"
+            card_view:cardCornerRadius="4dp"
+            android:layout_below="@id/sport_event_description">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_small"
+                >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/USMABlue"
+                android:id="@+id/title_details"
+                android:textStyle="bold"
+                android:text="@string/details"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/sport_event_address"
+                android:layout_below="@id/title_details"
+                android:layout_marginTop="@dimen/padding_small"/>
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:layout_width="@dimen/date_shower_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@color/USMABlueDark"
+            android:textSize="@dimen/text_size_small"
+            android:id="@id/day_of_week_event"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/padding_small"
+            android:paddingTop="@dimen/padding_small"
+            android:paddingBottom="@dimen/padding_small"
+            android:layout_below="@id/sport_event_name"
+            android:text="Mercredi"/>
+        <TextView
+            android:layout_width="@dimen/date_shower_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/day_of_week_event"
+            android:textSize="@dimen/text_size_very_large"
+            android:background="@color/USMAAccent"
+            android:id="@+id/day_of_month_event"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:text="25"/>
+        <TextView
+            android:layout_width="@dimen/date_shower_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/day_of_month_event"
+            android:textSize="@dimen/text_size_large"
+            android:background="@color/USMAAccent"
+            android:id="@+id/month_event"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:text="Janvier"/>
+
+        <TextView
+            android:layout_width="@dimen/date_shower_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/month_event"
+            android:textSize="@dimen/text_size_large"
+            android:background="@color/USMAAccent"
+            android:id="@+id/year_event"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:text="2016"/>
+
+
+
+    </RelativeLayout>
+
+</android.support.v4.widget.NestedScrollView>

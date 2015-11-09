@@ -24,10 +24,10 @@ import java.util.List;
 public abstract class ListFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private RecyclerView mRecyclerView;
+    protected RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-    private RecyclerView.Adapter mAdapter;
-    private List<Item> items;
+    protected RecyclerView.Adapter mAdapter;
+    protected List<Item> items;
 
     private OnFragmentInteractionListener mListener;
 
@@ -89,6 +89,8 @@ public abstract class ListFragment extends Fragment {
 
     public abstract void newItemAction();
 
+    public abstract void consultItemAction(int position);
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -104,14 +106,9 @@ public abstract class ListFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
-    public void addItem (Item newItem) {
-        items.add(newItem);
-        mAdapter.notifyDataSetChanged();
-    }
+    public abstract void notifyDataSetChanged();
 
-    public void notifyDataSetChanged() {
-        items = getItems();
-        mAdapter = new ListItemAdapter(items);
-        mRecyclerView.setAdapter(mAdapter);
+    public void setmAdapter(RecyclerView.Adapter mAdapter) {
+        this.mAdapter = mAdapter;
     }
 }

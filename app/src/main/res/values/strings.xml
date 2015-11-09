@@ -59,28 +59,36 @@
 
     <string name="err_msg_group_name">Entrer le nom du groupe</string>
 
+
+    <string name="details">Détails</string>
     <!-- NewRace Strings -->
     <string name="hint_race_name">Nom de la course</string>
     <string name="hint_race_description">Détail sur la course (nombre de km, dénivelé, heure ...) </string>
-    <string name="race_type">Type de course</string>
+    <string name="race_type">Type de course : </string>
     <string name="hint_race_date">Date</string>
     <string name="hint_race_address">Lieu de la course</string>
     <string name="save_race">Enregistrer la course</string>
+    <string name="new_race">Nouvelle course</string>
 
     <string name="err_msg_race_name">Entrer le nom de la course</string>
     <string name="err_msg_race_date">Entrer la date de la course</string>
 
+    <string-array name="array_race_type">
+        <item>Route</item>
+        <item>Cross</item>
+        <item>Trail</item>
+        <item>Piste</item>
+    </string-array>
+
     <!-- NewTraining Strings -->
     <string name="hint_training_name">Nom de l\'entraînement</string>
     <string name="hint_training_description">Détail (nombre de km, fractionnés, récup ...) </string>
-    <string name="training_type">Type d\'entrainement</string>
+    <string name="training_type">Type d\'entrainement : </string>
     <string name="hint_training_date">Date</string>
     <string name="hint_training_address">Lieu de la séance</string>
     <string name="save_training">Enregistrer la séance</string>
     <string name="new_training">Nouvel entraînement</string>
 
-    <string name="err_msg_training_name">Entrer le nom de la séance</string>
-    <string name="err_msg_training_date">Entrer la date de la séance</string>
 
     <string-array name="array_training_type">
         <item>Fractionné</item>
@@ -88,10 +96,12 @@
         <item>Séance longue</item>
     </string-array>
 
-    <string-array name="array_race_type">
-        <item>Route</item>
-        <item>Cross</item>
-        <item>Trail</item>
-    </string-array>
+    <!-- NewTraining Strings -->
+
+
+    <string name="err_msg_training_name">Entrer le nom de la séance</string>
+    <string name="err_msg_training_date">Entrer la date de la séance</string>
+
+
 
 </resources>

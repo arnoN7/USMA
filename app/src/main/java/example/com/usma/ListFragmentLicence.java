@@ -1,7 +1,5 @@
 package example.com.usma;
 
-import android.os.Bundle;
-
 import java.util.List;
 
 /**
@@ -21,6 +19,16 @@ public class ListFragmentLicence extends ListFragment {
 
     @Override
     public void newItemAction() {
+        //TODO
+    }
+
+    @Override
+    public void consultItemAction(int position) {
+        //TODO
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
         //TODO
     }
 }

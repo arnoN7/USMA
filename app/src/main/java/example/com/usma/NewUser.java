@@ -167,16 +167,16 @@ public class NewUser extends Fragment {
             public void done(ParseException e) {
                 ParseUser.logInInBackground(currentUser.getUsername(),
                         currentUser.get(User.LICENCE).toString());
-                closeNewUser();
                 Toast.makeText(getActivity().getApplicationContext(),
                         newUser.getString(User.FIRSTNAME) + " " +
-                        newUser.getString(User.NAME) + " " + getString(R.string.added),
+                                newUser.getString(User.NAME) + " " + getString(R.string.added),
                         Toast.LENGTH_SHORT).show();
-                ((ListFragmentUsers)((MainActivity)getActivity()).getCurrentFragment()).
-                        addUser(newUser);
 
             }
         });
+        ((ListFragmentUsers)((MainActivity)getActivity()).
+                getLoadedRootFragment(NavigationMenu.USERS)).notifyDataSetChanged();
+        closeNewUser();
     }
 
     private boolean validateName() {

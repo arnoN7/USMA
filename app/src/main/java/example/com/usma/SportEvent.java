@@ -1,5 +1,7 @@
 package example.com.usma;
 
+import android.content.res.Resources;
+
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 
@@ -14,7 +16,7 @@ public class SportEvent extends ParseObject {
     public static final String DESCRIPTION = "description";
     public static final String DATE = "date";
     public static final String MENU_TYPE = "type";
-    public static final String ADDRESS = "address";
+    public static final String DETAILS = "address";
     public static final String SPORT_TYPE = "sport_type";
 
 
@@ -46,24 +48,29 @@ public class SportEvent extends ParseObject {
         put(MENU_TYPE, type);
     }
 
-    public String getType() {
-        return getString(MENU_TYPE);
+    public NavigationMenu getType(Resources resources) {
+        String sType = getString(MENU_TYPE);
+        return NavigationMenu.getNavigationIDByString(sType, resources);
+
     }
 
     public void setAddress (String address) {
-        put(ADDRESS, address);
+        put(DETAILS, address);
     }
 
     public String getAddress() {
-        return getString(ADDRESS);
+        return getString(DETAILS);
     }
 
     public void setSportType(String sportType) {
         put(SPORT_TYPE, sportType);
     }
 
-    public String getSportType() {
-        return getString(SPORT_TYPE);
+    public SportsEventRaceType getSportEventRaceType(Resources resources) {
+        String sSportType = getString(SPORT_TYPE);
+        return SportsEventRaceType.getSportTypeByName(sSportType, resources);
     }
+
+
 
 }

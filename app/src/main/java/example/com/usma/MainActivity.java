@@ -4,6 +4,8 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -20,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -33,20 +36,28 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         ListFragment.OnFragmentInteractionListener,
-        NewUser.OnFragmentInteractionListener{
+        NewUser.OnFragmentInteractionListener,
+        ConsultSportEvent.OnFragmentInteractionListener {
     public static final String LIST_FRAGMENT_USER = "ListFragmentUsers";
-    private static final String LIST_FRAGMENT_GROUPS = "ListFragmentGroups";
-    private static final String LIST_FRAGMENT_RACE = "ListFragmentRace";
-    private static final String LIST_FRAGMENT_TRAINING = "ListFragmentTraining";
-    private static final String LIST_FRAGMENT_LICENCE = "ListFragmentLicence";
+    public static final String LIST_FRAGMENT_GROUPS = "ListFragmentGroups";
+    public static final String LIST_FRAGMENT_RACE = "ListFragmentRace";
+    public static final String LIST_FRAGMENT_TRAINING = "ListFragmentTraining";
+    public static final String LIST_FRAGMENT_LICENCE = "ListFragmentLicence";
     public static final String LIST_FRAGMENT_NEW_USER = "ListFragmentNewUser";
     public static final String LIST_FRAGMENT_NEW_GROUP = "ListFragmentNewGroup";
     public static final String LIST_FRAGMENT_NEW_TRAINING = "ListFragmentNewTraining";
     public static final String LIST_FRAGMENT_NEW_RACE = "ListFragmentNewTraining";
+
+    public static final String LIST_FRAGMENT_CONSULT_USER = "ListFragmentConsultUser";
+    public static final String LIST_FRAGMENT_CONSULT_GROUP = "ListFragmentConsultGroup";
+    public static final String LIST_FRAGMENT_CONSULT_TRAINING = "ListFragmentConsultTraining";
+    public static final String LIST_FRAGMENT_CONSULT_RACE = "ListFragmentConsultTraining";
+
     private static final String LIST_FRAGMENT_NO_TAG = "noTag";
 
     private static final String CURRENT_FRAGMENT_TAG = "currentFragmentTag";
     private static final String CURRENT_TITLE_TAG = "currentTitleTag";
+    private static final String CURRENT_HEADER_IMAGE_ID_TAG = "currentHeaderImageTag";
 
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
@@ -55,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements
     private List<Fragment> fragments;
     private String currentFragmentTag;
     private CollapsingToolbarLayout collapsingToolbarLayout;
+    private ImageView headerImage;
+    private int headerImageID;
     private ParseRole adminRole;
 
 
@@ -81,9 +94,11 @@ public class MainActivity extends AppCompatActivity implements
         if((savedInstanceState != null) &&
                 savedInstanceState.containsKey(CURRENT_FRAGMENT_TAG)){
             currentFragmentTag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG);
+            headerImageID = savedInstanceState.getInt(CURRENT_HEADER_IMAGE_ID_TAG);
 
         } else {
             currentFragmentTag = LIST_FRAGMENT_NO_TAG;
+            headerImageID = R.drawable.athle;
         }
 
         adminRole = null;
@@ -96,9 +111,8 @@ public class MainActivity extends AppCompatActivity implements
         email = ParseUser.getCurrentUser().getEmail();
         buttonNew = (FloatingActionButton) findViewById(R.id.button_new);
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-
-
-
+        headerImage = (ImageView) findViewById(R.id.toolbarImage);
+        setHeaderImage(headerImageID);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.RecyclerView); // Assigning the RecyclerView Object to the xml View
 
@@ -152,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements
             collapsingToolbarLayout.setTitle(title);
             initFragmentsFromLocalDataStore();
         } else {
-            initFragments();
+            initOnlineIfPossible();
             selectItem(NavigationMenu.RACES.getId()+1);
         }
         initNewButton();
@@ -174,6 +188,11 @@ public class MainActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void setHeaderImage (int imageID) {
+        headerImageID = imageID;
+        headerImage.setImageResource(imageID);
     }
 
     public DrawerLayout getDrawer() {
@@ -244,6 +263,21 @@ public class MainActivity extends AppCompatActivity implements
             ((ListFragment) fragments.get(NavigationMenu.RACES.getId())).notifyDataSetChanged();
         }
     }
+    private void initOnlineIfPossible() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(this.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if ((ni != null) && (ni.isConnected())) {
+            initFragments();
+        } else {
+            // If there is no connection, let the user know the sync didn't happen
+            initFragmentsFromLocalDataStore();
+            Toast.makeText(
+                    getApplicationContext(),
+                    "Your device appears to be offline. Some todos may not have been synced to Parse.",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
 
     private void initFragmentsFromLocalDataStore() {
         fragments = new ArrayList<>();
@@ -319,6 +353,13 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initFragments () {
         fragments = new ArrayList<>();
+        try {
+            ParseUser.unpinAll();
+            ParseRole.unpinAll();
+            SportEvent.unpinAll();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         for (int i = 0; i < navigationMenu.length; i++) {
             switch (navigationMenu[i]) {
                 case USERS:
@@ -367,9 +408,8 @@ public class MainActivity extends AppCompatActivity implements
                         public void done(List<SportEvent> sportEvents, ParseException e) {
                             NavigationMenu sportEventType;
                             if ((sportEvents != null) && (sportEvents.size() > 0)) {
-                                sportEventType = NavigationMenu.getNavigationIDByString(
-                                        sportEvents.get(0).getType(), getApplicationContext());
-                                if(sportEventType == NavigationMenu.RACES) {
+                                sportEventType = sportEvents.get(0).getType(getResources());
+                                if (sportEventType == NavigationMenu.RACES) {
                                     setRaces(sportEvents);
                                 } else if (sportEventType == NavigationMenu.TRAINING) {
                                     setTrainings(sportEvents);
@@ -399,6 +439,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onSaveInstanceState(Bundle outState) {
         outState.putString(CURRENT_FRAGMENT_TAG, currentFragmentTag);
         outState.putString(CURRENT_TITLE_TAG, collapsingToolbarLayout.getTitle().toString());
+        outState.putInt(CURRENT_HEADER_IMAGE_ID_TAG, headerImageID);
         super.onSaveInstanceState(outState);
     }
 
@@ -409,6 +450,10 @@ public class MainActivity extends AppCompatActivity implements
     public Fragment getLocalFragmentByTag(String tag) {
         FragmentManager fragmentManager = getFragmentManager();
         return fragmentManager.findFragmentByTag(tag);
+    }
+
+    public Fragment getLoadedRootFragment(NavigationMenu menu) {
+        return fragments.get(menu.getId());
     }
 
     public void setCurrentFragmentTag(String currentFragmentTag) {

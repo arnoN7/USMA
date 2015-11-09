@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.ParseException;
@@ -40,9 +41,11 @@ import java.util.Locale;
 public class NewSportEvent extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private TextInputLayout inputLayoutTrainingName, inputLayoutTrainingDate;
+    private TextInputLayout inputLayoutTrainingName, inputLayoutTrainingAddress,
+            inputLayoutTrainingDescription, inputLayoutTrainingDate;
     private EditText inputTrainingName, inputTrainingDescription, inputTrainingDate,
             inputTrainingAddress;
+    private TextView textSportEventTrainingType;
     private Spinner inputSportType;
     private Button saveButton;
     private String[] sportEventTypes;
@@ -85,22 +88,34 @@ public class NewSportEvent extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =inflater.inflate(R.layout.fragment_sport_event, container, false);
+        int arraySportEventTypesID;
         inputSportType = (Spinner) view.findViewById(R.id.sports_type);
-        sportEventTypes = getResources().getStringArray(R.array.array_training_type);
+        if (sportEventType == NavigationMenu.RACES) {
+            arraySportEventTypesID = R.array.array_race_type;
+        } else {
+            arraySportEventTypesID = R.array.array_training_type;
+        }
+        sportEventTypes = getResources().getStringArray(arraySportEventTypesID);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.array_training_type, android.R.layout.simple_spinner_item);
+                arraySportEventTypesID, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         inputSportType.setAdapter(adapter);
         inputLayoutTrainingName = (TextInputLayout)
                 view.findViewById(R.id.input_layout_training_name);
-        inputLayoutTrainingDate = (TextInputLayout) view.findViewById(R.id.input_layout_training_date);
+        inputLayoutTrainingDate = (TextInputLayout) view.findViewById(R.id.
+                input_layout_training_date);
+        inputLayoutTrainingAddress = (TextInputLayout) view.findViewById(R.
+                id.input_layout_training_address);
+        inputLayoutTrainingDescription = (TextInputLayout) view.
+                findViewById(R.id.input_layout_training_description);
         inputTrainingName = (EditText) view.findViewById(R.id.input_training_name);
         inputTrainingDescription = (EditText) view.findViewById(R.id.input_training_description);
         inputTrainingDate = (EditText) view.findViewById(R.id.input_training_date);
         inputTrainingAddress = (EditText) view.findViewById(R.id.input_training_address);
+        textSportEventTrainingType = (TextView) view.findViewById(R.id.text_sport_event_type);
 
         saveButton = (Button) view.findViewById(R.id.save_race);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -114,6 +129,27 @@ public class NewSportEvent extends Fragment {
         trainingDate = null;
         setDateFields();
         ((MainActivity)getActivity()).hideFab(true);
+
+        if (sportEventType == NavigationMenu.RACES) {
+            inputLayoutTrainingName.setHint(getString(R.string.hint_race_name));
+            inputLayoutTrainingDate.setHint(getString(R.string.hint_race_date));
+            inputLayoutTrainingDescription.setHint(getString(R.string.hint_race_description));
+            inputLayoutTrainingAddress.setHint(getString(R.string.hint_race_address));
+            textSportEventTrainingType.setText(getString(R.string.race_type));
+            saveButton.setText(getString(R.string.save_race));
+            ((MainActivity)getActivity()).getCollapsingToolbarLayout().
+                    setTitle(getString(R.string.new_race));
+        } else {
+            inputLayoutTrainingName.setHint(getString(R.string.hint_training_name));
+            inputLayoutTrainingDate.setHint(getString(R.string.hint_training_date));
+            inputLayoutTrainingDescription.setHint(getString(R.string.hint_training_description));
+            inputLayoutTrainingAddress.setHint(getString(R.string.hint_training_address));
+            textSportEventTrainingType.setText(getString(R.string.training_type));
+            saveButton.setText(getString(R.string.save_training));
+            ((MainActivity)getActivity()).getCollapsingToolbarLayout().
+                    setTitle(getString(R.string.new_training));
+        }
+
         return view;
 
     }
@@ -127,24 +163,20 @@ public class NewSportEvent extends Fragment {
             return;
         }
 
-        final SportEvent newTraining = new SportEvent();
+        SportEvent newTraining = new SportEvent();
         newTraining.setName(inputTrainingName.getText().toString());
         newTraining.setDescription(inputTrainingDescription.getText().toString());
         newTraining.setSportType(sportEventTypes[inputSportType.getSelectedItemPosition()]);
         newTraining.setType(getString(sportEventType.getNameID()));
         newTraining.setAddress(inputTrainingAddress.getText().toString());
         newTraining.setDate(trainingDate);
-        newTraining.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                closeNewTraining();
-                Toast.makeText(getActivity().getApplicationContext(),
-                        newTraining.getName() + " " + getString(R.string.added),
-                        Toast.LENGTH_SHORT).show();
-                ((ListFragmentSportEvent) ((MainActivity) getActivity()).getCurrentFragment()).
-                        addSportEvent(newTraining, NavigationMenu.TRAINING);
-            }
-        });
+        newTraining.saveEventually();
+        try {
+            newTraining.pin();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        closeNewTraining();
 
     }
     private void setDateFields(){

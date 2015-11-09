@@ -11,6 +11,9 @@ import com.parse.ParseACL;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by Arnaud Rover on 13/09/15.
  */
@@ -56,5 +59,11 @@ public class USMAApplication extends Application{
         if (view.requestFocus()) {
             activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         }
+    }
+
+    public static Calendar DateToCalendar(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal;
     }
 }

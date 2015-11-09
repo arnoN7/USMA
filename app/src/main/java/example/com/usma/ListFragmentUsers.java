@@ -4,9 +4,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.widget.Button;
 
 import com.parse.ParseUser;
 
@@ -55,12 +52,22 @@ public class ListFragmentUsers  extends ListFragment{
         ft.commit();
     }
 
-    public void addUser(ParseUser newUser) {
-        users.add(newUser);
-        super.addItem(new Item(NavigationMenu.USERS, newUser.get(User.FIRSTNAME) + " " +
-                newUser.get(User.NAME), newUser.getEmail()));
+    @Override
+    public void consultItemAction(int position) {
+        //TODO
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        ((ListFragmentUsers)((MainActivity)getActivity()).
+                getLoadedRootFragment(NavigationMenu.USERS)).notifyDataSetChanged();
+    }
 
+    public void notifyDataSetChanged() {
+        items = getItems();
+        mAdapter = new ListItemAdapter.ListItemAdapterUser(items, getActivity());
+        mRecyclerView.setAdapter(mAdapter);
+    }
 
 }

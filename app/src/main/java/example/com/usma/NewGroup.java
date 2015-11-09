@@ -112,19 +112,10 @@ public class NewGroup extends Fragment {
         }
         ParseACL roleACL = new ParseACL();
         roleACL.setPublicReadAccess(true);
-        final ParseRole newRole = new ParseRole(inputGroupName.getText().toString(),roleACL);
+        ParseRole newRole = new ParseRole(inputGroupName.getText().toString(),roleACL);
         newRole.put(GroupUsers.DESCRIPTION, inputGroupDescription.getText().toString());
-        newRole.saveEventually(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                closeNewGroup();
-                Toast.makeText(getActivity().getApplicationContext(),
-                        newRole.getName() + " " + getString(R.string.added),
-                        Toast.LENGTH_SHORT).show();
-                ((ListFragmentGroups) ((MainActivity) getActivity()).getCurrentFragment()).
-                        addGroup(newRole);
-            }
-        });
+        newRole.saveEventually();
+        closeNewGroup();
     }
 
     private void closeNewGroup() {

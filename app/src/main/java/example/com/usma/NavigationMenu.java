@@ -1,6 +1,7 @@
 package example.com.usma;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 /**
  * Created by Arnaud Rover on 16/10/15.
@@ -37,34 +38,16 @@ public enum NavigationMenu {
     }
 
     public static NavigationMenu getNavigationMenuByID (int id) {
-        if (id == RACES.id) {
-            return RACES;
-        } else if (id == TRAINING.id) {
-            return TRAINING;
-        } else if (id == GROUPS.id) {
-            return GROUPS;
-        } else if (id == LICENCE.id) {
-            return LICENCE;
-        } else if (id == USERS.id) {
-            return USERS;
-        } else {
-            return null;
-        }
+        return NavigationMenu.values()[id];
     }
 
-    public static NavigationMenu getNavigationIDByString(String nameMenu, Context context) {
-        if (context.getString(RACES.nameID).equals(nameMenu)) {
-            return RACES;
-        } else if (context.getString(TRAINING.nameID).equals(nameMenu)) {
-            return TRAINING;
-        } else if (context.getString(GROUPS.nameID).equals(nameMenu)) {
-            return GROUPS;
-        } else if (context.getString(LICENCE.nameID).equals(nameMenu)) {
-            return LICENCE;
-        } else if (context.getString(USERS.nameID).equals(nameMenu)) {
-            return USERS;
-        } else {
-            return null;
+    public static NavigationMenu getNavigationIDByString(String nameMenu, Resources resources) {
+        for (int i = 0; i < NavigationMenu.values().length; i++) {
+            if (resources.getString(NavigationMenu.values()[i].getNameID()).
+                    equals(nameMenu)){
+                return NavigationMenu.values()[i];
+            }
         }
+        return null;
     }
 }

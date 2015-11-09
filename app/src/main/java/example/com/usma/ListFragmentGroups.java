@@ -3,7 +3,7 @@ package example.com.usma;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.os.Bundle;
+import android.content.Context;
 
 import com.parse.ParseRole;
 
@@ -46,6 +46,12 @@ public class ListFragmentGroups extends ListFragment {
         ft.commit();
     }
 
+    @Override
+    public void consultItemAction(int position) {
+        //update the main content by replacing fragments
+        //TODO
+    }
+
     public static ListFragmentGroups newInstance() {
         ListFragmentGroups fragment = new ListFragmentGroups();
         return fragment;
@@ -62,9 +68,17 @@ public class ListFragmentGroups extends ListFragment {
         }
         return adminRole;
     }
-    public void addGroup(ParseRole newGroup) {
-        groups.add(newGroup);
-        super.addItem(new Item(NavigationMenu.GROUPS, newGroup.getName(),
-                newGroup.getString(GroupUsers.DESCRIPTION)));
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        ((ListFragmentGroups) ((MainActivity) getActivity()).
+                getLoadedRootFragment(NavigationMenu.GROUPS)).notifyDataSetChanged();
+    }
+
+    public void notifyDataSetChanged() {
+        items = getItems();
+        mAdapter = new ListItemAdapter.ListItemAdapterGroup(items, getActivity());
+        mRecyclerView.setAdapter(mAdapter);
     }
 }
