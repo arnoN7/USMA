@@ -22,20 +22,6 @@ public class ListFragmentGroups extends ListFragment {
     }
 
     @Override
-    protected List<Item> getItems() {
-        List<Item> items = new ArrayList<>();
-        groups = ((MainActivity)getActivity()).getGroups();
-        if(groups != null){
-            for (ParseRole group : groups
-                    ) {
-                items.add(new Item(NavigationMenu.GROUPS, group.getString(GroupUsers.NAME),
-                        group.getString(GroupUsers.DESCRIPTION)));
-            }
-        }
-        return items;
-    }
-
-    @Override
     public void newItemAction() {
         //update the main content by replacing fragments
         final Fragment fragment = new NewGroup();
@@ -77,8 +63,7 @@ public class ListFragmentGroups extends ListFragment {
     }
 
     public void notifyDataSetChanged() {
-        items = getItems();
-        mAdapter = new ListItemAdapter.ListItemAdapterGroup(items, getActivity());
+        mAdapter = new ListItemAdapter.ListItemAdapterGroup(getActivity());
         mRecyclerView.setAdapter(mAdapter);
     }
 }

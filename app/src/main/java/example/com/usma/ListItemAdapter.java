@@ -7,13 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.parse.ParseRole;
+import com.parse.ParseUser;
+
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Arnaud Rover on 18/10/15.
  */
 public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ItemViewHolder> {
-    protected List<Item> mDataset;
     protected Context context;
 
 
@@ -45,8 +49,7 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ListItemAdapter(List<Item> myDataset, Context context) {
-        mDataset = myDataset;
+    public ListItemAdapter(Context context) {
         this.context = context;
     }
 
@@ -64,48 +67,119 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ItemViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
-        holder.mTextViewName.setText(mDataset.get(position).getName());
-        holder.mTextViewDescription.setText(mDataset.get(position).getDescription());
-
-    }
+    public abstract void onBindViewHolder(ItemViewHolder holder, int position);
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
-    public int getItemCount() {
-        return mDataset.size();
-    }
+    public abstract int getItemCount();
 
     public static class ListItemAdapterTraining extends ListItemAdapter {
-        public ListItemAdapterTraining(List<Item> myDataset, Context context) {
-            super(myDataset, context);
+        private List<SportEvent> trainings;
+        public ListItemAdapterTraining(Context context) {
+            super(context);
+            this.trainings = ((MainActivity) context).getSportEvent(NavigationMenu.TRAINING);
+        }
+
+        @Override
+        public void onBindViewHolder(ItemViewHolder holder, int position) {
+            SportEvent currentRace = trainings.get(position);
+            Calendar cal = USMAApplication.DateToCalendar(currentRace.getDate());
+            holder.mTextViewName.setText(currentRace.getName());
+            holder.mTextViewDescription.setText(currentRace.getDescription());
+
+            holder.mTextViewYear.setText(String.valueOf(cal.get(Calendar.YEAR)));
+            holder.mTextViewMonth.setText(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
+            holder.mTextViewDay.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
+            holder.mTextViewDayOfWeek.setText(cal.getDisplayName(Calendar.DAY_OF_WEEK,
+                    Calendar.LONG, Locale.getDefault()));
+
+            holder.mTextViewYear.setVisibility(View.VISIBLE);
+            holder.mTextViewMonth.setVisibility(View.VISIBLE);
+            holder.mTextViewDay.setVisibility(View.VISIBLE);
+            holder.mTextViewDayOfWeek.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public int getItemCount() {
+            return trainings.size();
         }
     }
 
     public static class ListItemAdapterRace extends ListItemAdapter {
-        public ListItemAdapterRace(List<Item> myDataset, Context context) {
-            super(myDataset, context);
+        private List<SportEvent> races;
+
+        public ListItemAdapterRace(Context context) {
+            super(context);
+            this.races = ((MainActivity)context).getSportEvent(NavigationMenu.RACES);
         }
         // Replace the contents of a view (invoked by the layout manager)
         @Override
         public void onBindViewHolder(ItemViewHolder holder, int position) {
-            super.onBindViewHolder(holder,position);
-            holder.mTextViewYear.setText(mDataset.get(position).getName());
+            SportEvent currentRace = races.get(position);
+            Calendar cal = USMAApplication.DateToCalendar(currentRace.getDate());
+            holder.mTextViewName.setText(currentRace.getName());
+            holder.mTextViewDescription.setText(currentRace.getDescription());
+
+            holder.mTextViewYear.setText(String.valueOf(cal.get(Calendar.YEAR)));
+
+            holder.mTextViewMonth.setText(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
+            holder.mTextViewDay.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
+            holder.mTextViewDayOfWeek.setText(cal.getDisplayName(Calendar.DAY_OF_WEEK,
+                    Calendar.LONG, Locale.getDefault()));
+
+            holder.mTextViewYear.setVisibility(View.VISIBLE);
+            holder.mTextViewMonth.setVisibility(View.VISIBLE);
+            holder.mTextViewDay.setVisibility(View.VISIBLE);
+            holder.mTextViewDayOfWeek.setVisibility(View.VISIBLE);
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return races.size();
         }
 
     }
 
     public static class ListItemAdapterUser extends ListItemAdapter {
-        public ListItemAdapterUser(List<Item> myDataset, Context context) {
-            super(myDataset, context);
+        private List<ParseUser> users;
+
+        public ListItemAdapterUser(Context context) {
+            super(context);
+            this.users = ((MainActivity)context).getUsers();
+        }
+
+        @Override
+        public void onBindViewHolder(ItemViewHolder holder, int position) {
+            ParseUser user = users.get(position);
+            holder.mTextViewName.setText(user.get(User.FIRSTNAME) + " " +
+                    user.get(User.NAME));
+            holder.mTextViewDescription.setText(user.getEmail());
+        }
+
+        @Override
+        public int getItemCount() {
+            return users.size();
         }
     }
 
     public static class ListItemAdapterGroup extends ListItemAdapter {
-        public ListItemAdapterGroup(List<Item> myDataset, Context context) {
-            super(myDataset, context);
+        private List<ParseRole> groups;
+        public ListItemAdapterGroup(Context context) {
+            super(context);
+            this.groups = ((MainActivity) context).getGroups();
+        }
+
+        @Override
+        public void onBindViewHolder(ItemViewHolder holder, int position) {
+            ParseRole group = groups.get(position);
+            holder.mTextViewName.setText(group.getString(GroupUsers.NAME));
+            holder.mTextViewDescription.setText(group.getString(GroupUsers.DESCRIPTION));
+        }
+
+        @Override
+        public int getItemCount() {
+            return groups.size();
         }
     }
 }

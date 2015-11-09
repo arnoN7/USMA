@@ -21,21 +21,6 @@ public class ListFragmentUsers  extends ListFragment{
 
     }
 
-    @Override
-    protected List<Item> getItems() {
-        users = ((MainActivity) getActivity()).getUsers();
-        List<Item> items = new ArrayList<>();
-        if (users != null) {
-            for (ParseUser user : users
-                    ) {
-                items.add(new Item(NavigationMenu.USERS, user.get(User.FIRSTNAME) + " " +
-                        user.get(User.NAME), user.getEmail()));
-            }
-        }
-        return items;
-    }
-
-
     public static ListFragmentUsers newInstance() {
         ListFragmentUsers fragment = new ListFragmentUsers();
         return fragment;
@@ -65,8 +50,7 @@ public class ListFragmentUsers  extends ListFragment{
     }
 
     public void notifyDataSetChanged() {
-        items = getItems();
-        mAdapter = new ListItemAdapter.ListItemAdapterUser(items, getActivity());
+        mAdapter = new ListItemAdapter.ListItemAdapterUser(getActivity());
         mRecyclerView.setAdapter(mAdapter);
     }
 

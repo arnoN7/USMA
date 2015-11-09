@@ -27,7 +27,6 @@ public abstract class ListFragment extends Fragment {
     protected RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     protected RecyclerView.Adapter mAdapter;
-    protected List<Item> items;
 
     private OnFragmentInteractionListener mListener;
 
@@ -60,8 +59,6 @@ public abstract class ListFragment extends Fragment {
         notifyDataSetChanged();
         return rootView;
     }
-
-    protected abstract List<Item> getItems();
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

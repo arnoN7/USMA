@@ -526,7 +526,7 @@ public class MainActivity extends AppCompatActivity implements
         ParseQuery<SportEvent> querySportEvent = ParseQuery.getQuery(SportEvent.class);
         querySportEvent.whereEqualTo(SportEvent.MENU_TYPE,
                 getString(sportType.getNameID()));
-        querySportEvent.orderByDescending(SportEvent.DATE);
+        querySportEvent.orderByAscending(SportEvent.DATE);
         querySportEvent.fromLocalDatastore();
         List<SportEvent> sportEvents = null;
         try {

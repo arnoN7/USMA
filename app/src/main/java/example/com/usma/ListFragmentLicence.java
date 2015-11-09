@@ -13,11 +13,6 @@ public class ListFragmentLicence extends ListFragment {
     }
 
     @Override
-    protected List<Item> getItems() {
-        return null;
-    }
-
-    @Override
     public void newItemAction() {
         //TODO
     }

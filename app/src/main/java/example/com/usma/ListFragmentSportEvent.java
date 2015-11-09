@@ -23,21 +23,6 @@ public class ListFragmentSportEvent extends ListFragment{
     }
 
     @Override
-    protected List<Item> getItems() {
-        List<Item> items = new ArrayList<>();
-        sportEvents = ((MainActivity)getActivity()).getSportEvent(sportEventsType);
-        if(sportEventsType != null) {
-            for (SportEvent sportEvent : sportEvents
-                    ) {
-                Item item = new Item(sportEventsType, sportEvent.getName(),
-                        sportEvent.getDescription());
-                items.add(item);
-            }
-        }
-        return items;
-    }
-
-    @Override
     public void newItemAction() {
         //update the main content by replacing fragments
         final Fragment fragment = NewSportEvent.newInstance(sportEventsType);
@@ -81,11 +66,10 @@ public class ListFragmentSportEvent extends ListFragment{
     }
 
     public void notifyDataSetChanged() {
-        items = getItems();
         if(sportEventsType == NavigationMenu.RACES) {
-            mAdapter = new ListItemAdapter.ListItemAdapterRace(items, getActivity());
+            mAdapter = new ListItemAdapter.ListItemAdapterRace(getActivity());
         } else if (sportEventsType == NavigationMenu.TRAINING) {
-            mAdapter = new ListItemAdapter.ListItemAdapterTraining(items, getActivity());
+            mAdapter = new ListItemAdapter.ListItemAdapterTraining(getActivity());
         } else {
             throw new RuntimeException("Illegal NavigationMenu item in SportEvent "
                     + getString(sportEventsType.getNameID()));
