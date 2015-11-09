@@ -65,6 +65,23 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
         return vh;
     }
 
+    public void onBindSportEventView(SportEvent sportEvent, ItemViewHolder holder) {
+        Calendar cal = USMAApplication.DateToCalendar(sportEvent.getDate());
+        holder.mTextViewName.setText(sportEvent.getName());
+        holder.mTextViewDescription.setText(sportEvent.getDescription());
+
+        holder.mTextViewYear.setText(String.valueOf(cal.get(Calendar.YEAR)));
+        holder.mTextViewMonth.setText(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
+        holder.mTextViewDay.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
+        holder.mTextViewDayOfWeek.setText(cal.getDisplayName(Calendar.DAY_OF_WEEK,
+                Calendar.LONG, Locale.getDefault()));
+
+        holder.mTextViewYear.setVisibility(View.VISIBLE);
+        holder.mTextViewMonth.setVisibility(View.VISIBLE);
+        holder.mTextViewDay.setVisibility(View.VISIBLE);
+        holder.mTextViewDayOfWeek.setVisibility(View.VISIBLE);
+    }
+
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public abstract void onBindViewHolder(ItemViewHolder holder, int position);
@@ -83,20 +100,7 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
         @Override
         public void onBindViewHolder(ItemViewHolder holder, int position) {
             SportEvent currentRace = trainings.get(position);
-            Calendar cal = USMAApplication.DateToCalendar(currentRace.getDate());
-            holder.mTextViewName.setText(currentRace.getName());
-            holder.mTextViewDescription.setText(currentRace.getDescription());
-
-            holder.mTextViewYear.setText(String.valueOf(cal.get(Calendar.YEAR)));
-            holder.mTextViewMonth.setText(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
-            holder.mTextViewDay.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
-            holder.mTextViewDayOfWeek.setText(cal.getDisplayName(Calendar.DAY_OF_WEEK,
-                    Calendar.LONG, Locale.getDefault()));
-
-            holder.mTextViewYear.setVisibility(View.VISIBLE);
-            holder.mTextViewMonth.setVisibility(View.VISIBLE);
-            holder.mTextViewDay.setVisibility(View.VISIBLE);
-            holder.mTextViewDayOfWeek.setVisibility(View.VISIBLE);
+            onBindSportEventView(currentRace, holder);
         }
 
         @Override
@@ -116,22 +120,7 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
         @Override
         public void onBindViewHolder(ItemViewHolder holder, int position) {
             SportEvent currentRace = races.get(position);
-            Calendar cal = USMAApplication.DateToCalendar(currentRace.getDate());
-            holder.mTextViewName.setText(currentRace.getName());
-            holder.mTextViewDescription.setText(currentRace.getDescription());
-
-            holder.mTextViewYear.setText(String.valueOf(cal.get(Calendar.YEAR)));
-
-            holder.mTextViewMonth.setText(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
-            holder.mTextViewDay.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
-            holder.mTextViewDayOfWeek.setText(cal.getDisplayName(Calendar.DAY_OF_WEEK,
-                    Calendar.LONG, Locale.getDefault()));
-
-            holder.mTextViewYear.setVisibility(View.VISIBLE);
-            holder.mTextViewMonth.setVisibility(View.VISIBLE);
-            holder.mTextViewDay.setVisibility(View.VISIBLE);
-            holder.mTextViewDayOfWeek.setVisibility(View.VISIBLE);
-
+            onBindSportEventView(currentRace, holder);
         }
 
         @Override
