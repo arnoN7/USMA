@@ -5,6 +5,7 @@
     <dimen name="detail_backdrop_height">180dp</dimen>
 
     <dimen name="date_shower_width">110dp</dimen>
+    <dimen name="date_shower_width_list">80dp</dimen>
 
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
@@ -20,9 +21,5 @@
     <dimen name="fab_button_margin">16dp</dimen>
     <dimen name="elevation_low">1dp</dimen>
     <dimen name="elevation_high">8dp</dimen>
-
-    <dimen name="text_size_small">14sp</dimen>
-    <dimen name="text_size_medium">18sp</dimen>
-    <dimen name="text_size_large">22sp</dimen>
-    <dimen name="text_size_very_large">35sp</dimen>
+    
 </resources>

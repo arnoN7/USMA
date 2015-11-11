@@ -21,16 +21,35 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/image_item"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true"
                 android:layout_marginRight="16dp"
                 />
+            <android.support.v7.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/type_card_view"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                card_view:cardCornerRadius="4dp"
+                android:layout_alignParentTop="true"
+                card_view:cardBackgroundColor="@color/USMAAccent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/white"
+                    android:id="@+id/type_details"
+                    android:text="@string/details"
+                    android:visibility="gone"/>
+                </android.support.v7.widget.CardView>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/item_name"
                 android:layout_toRightOf="@+id/image_item"
-                android:layout_alignParentTop="true"
+                android:layout_below="@id/type_card_view"
                 android:textColor="@color/USMABlue"
                 android:textStyle="bold"
                 android:textSize="14sp"
@@ -45,58 +64,47 @@
                 android:textSize="12sp"
                 />
             <TextView
-                android:layout_width="@dimen/date_shower_width"
+                android:layout_width="@dimen/date_shower_width_list"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:background="@color/USMABlueDark"
-                android:textSize="@dimen/text_size_small"
+                style="@style/date_dark"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/day_of_week_list"
-                android:textColor="@color/white"
-                android:gravity="center"
                 android:layout_marginTop="@dimen/padding_small"
                 android:paddingTop="@dimen/padding_small"
                 android:paddingBottom="@dimen/padding_small"
                 android:layout_below="@id/sport_event_name"
-                android:visibility="gone"
-                android:text="Mercredi" />
+                android:visibility="gone" />
             <TextView
-                android:layout_width="@dimen/date_shower_width"
+                android:layout_width="@dimen/date_shower_width_list"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_below="@id/day_of_week_list"
-                android:textSize="@dimen/text_size_medium"
-                android:background="@color/USMAAccent"
+                style="@style/date_light"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/day_of_month_list"
-                android:textColor="@color/white"
-                android:gravity="center"
-                android:visibility="gone"
-                android:text="25"/>
+                android:visibility="gone" />
             <TextView
-                android:layout_width="@dimen/date_shower_width"
+                android:layout_width="@dimen/date_shower_width_list"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                style="@style/date_light"
                 android:layout_below="@id/day_of_month_list"
-                android:textSize="@dimen/text_size_medium"
-                android:background="@color/USMAAccent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/month_list"
-                android:textColor="@color/white"
-                android:gravity="center"
-                android:visibility="gone"
-                android:text="Janvier"/>
+                android:visibility="gone" />
 
             <TextView
-                android:layout_width="@dimen/date_shower_width"
+                android:layout_width="@dimen/date_shower_width_list"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                style="@style/date_light"
                 android:layout_below="@id/month_list"
-                android:textSize="@dimen/text_size_small"
-                android:background="@color/USMAAccent"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:id="@+id/year_list"
-                android:textColor="@color/white"
-                android:gravity="center"
-                android:visibility="gone"
-                android:text="2016"/>
+                android:layout_marginBottom="@dimen/padding_medium"
+                android:visibility="gone" />
 
         </RelativeLayout>
 

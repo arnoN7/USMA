@@ -5,13 +5,13 @@ import android.app.FragmentManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -35,7 +35,7 @@ public class ConsultSportEvent extends Fragment {
     private TextView mTitleEvent, mDescriptionEvent, mAddressEvent, mDayOfWeek, mDayOfMonth, mYear,
     mMonth;
     private SportEvent sportEvent;
-    private NavigationMenu sportEventType;
+    private NavigationMenu navigationType;
     private int position;
 
     /**
@@ -48,14 +48,14 @@ public class ConsultSportEvent extends Fragment {
                                                 NavigationMenu sportEventType) {
         ConsultSportEvent fragment = new ConsultSportEvent();
         fragment.position = position;
-        fragment.sportEventType = sportEventType;
+        fragment.navigationType = sportEventType;
         return fragment;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(CURRENT_POSITION_TAG, position);
-        outState.putString(CURRENT_SPORT_TYPE_TAG, getString(sportEventType.getNameID()));
+        outState.putString(CURRENT_SPORT_TYPE_TAG, getString(navigationType.getNameID()));
         super.onSaveInstanceState(outState);
     }
 
@@ -104,25 +104,24 @@ public class ConsultSportEvent extends Fragment {
     }
 
     private void setHeaderImage() {
-        if (sportEvent.getType(getResources()) == NavigationMenu.RACES) {
-            SportsEventRaceType raceType = sportEvent.getSportEventRaceType(getResources());
-            ((MainActivity) getActivity()).setHeaderImage(raceType.getImageID());
-        }
+        SportsEventType sportEventType = sportEvent.getSportEventType(getResources(),
+                navigationType);
+        ((MainActivity) getActivity()).setHeaderImage(sportEventType.getImageID());
     }
     private void loadSaveInstance(Bundle savedInstanceState) {
         if(savedInstanceState != null) {
             position = savedInstanceState.getInt(CURRENT_POSITION_TAG);
             if (savedInstanceState.getString(CURRENT_SPORT_TYPE_TAG).
                     equals(getString(NavigationMenu.RACES.getNameID()))) {
-                sportEventType = NavigationMenu.RACES;
+                navigationType = NavigationMenu.RACES;
             } else {
-                sportEventType = NavigationMenu.TRAINING;
+                navigationType = NavigationMenu.TRAINING;
             }
         }
     }
 
     private SportEvent loadSportEvent() {
-        return ((MainActivity) getActivity()).getSportEvent(sportEventType).get(position);
+        return ((MainActivity) getActivity()).getSportEvent(navigationType).get(position);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -186,7 +185,7 @@ public class ConsultSportEvent extends Fragment {
     private void closeConsultSport() {
         FragmentManager fm = getActivity().getFragmentManager();
         fm.beginTransaction().remove(this).commit();
-        ((MainActivity)getActivity()).selectItem(sportEventType.getId() + 1);
+        ((MainActivity)getActivity()).selectItem(navigationType.getId() + 1);
     }
 
     @Override

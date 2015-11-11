@@ -36,4 +36,16 @@
         <item name="android:paddingLeft">@dimen/padding_medium</item>
         <item name="android:paddingRight">@dimen/padding_medium</item>
     </style>
+
+    <style name="date_dark" >
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:background">@color/USMABlueDark</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="date_light" parent="date_dark">
+        <item name="android:background">@color/USMABlue</item>
+    </style>
+
 </resources>

@@ -1,12 +1,12 @@
 package example.com.usma;
 
 import android.app.DatePickerDialog;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,10 +19,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.parse.ParseException;
-import com.parse.SaveCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -52,7 +50,11 @@ public class NewSportEvent extends Fragment {
     private DatePickerDialog datePickerDialog;
     private Date trainingDate;
     private SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.FRANCE);
-    private NavigationMenu sportEventType;
+    private NavigationMenu navigationMenu;
+    private SportEvent currentSportEvent;
+    private int currentPosition = 0;
+    private RecyclerView mGroups;
+
 
     /**
      * Use this factory method to create a new instance of
@@ -62,7 +64,7 @@ public class NewSportEvent extends Fragment {
     // TODO: Rename and change types and number of parameters
     public static NewSportEvent newInstance(NavigationMenu sportEventType) {
         NewSportEvent fragment = new NewSportEvent();
-        fragment.sportEventType = sportEventType;
+        fragment.navigationMenu = sportEventType;
 
         return fragment;
     }
@@ -80,6 +82,10 @@ public class NewSportEvent extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        if(currentSportEvent != null) {
+            outState.putInt(ListFragmentSportEvent.MODIFY_EVENT_TAG, currentPosition);
+        }
+
         super.onSaveInstanceState(outState);
     }
 
@@ -87,10 +93,18 @@ public class NewSportEvent extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Bundle args = getArguments();
+        currentSportEvent = null;
+        if (savedInstanceState != null &&
+                savedInstanceState.containsKey(ListFragmentSportEvent.MODIFY_EVENT_TAG)) {
+            currentPosition = savedInstanceState.getInt(ListFragmentSportEvent.MODIFY_EVENT_TAG);
+            currentSportEvent = ((MainActivity)getActivity()).
+                    getSportEvent(navigationMenu).get(currentPosition);
+        }
         View view =inflater.inflate(R.layout.fragment_sport_event, container, false);
         int arraySportEventTypesID;
         inputSportType = (Spinner) view.findViewById(R.id.sports_type);
-        if (sportEventType == NavigationMenu.RACES) {
+        if (navigationMenu == NavigationMenu.RACES) {
             arraySportEventTypesID = R.array.array_race_type;
         } else {
             arraySportEventTypesID = R.array.array_training_type;
@@ -126,11 +140,9 @@ public class NewSportEvent extends Fragment {
         });
         ((MainActivity)getActivity()).getCollapsingToolbarLayout().
                 setTitle(getString(R.string.new_training));
-        trainingDate = null;
-        setDateFields();
         ((MainActivity)getActivity()).hideFab(true);
 
-        if (sportEventType == NavigationMenu.RACES) {
+        if (navigationMenu == NavigationMenu.RACES) {
             inputLayoutTrainingName.setHint(getString(R.string.hint_race_name));
             inputLayoutTrainingDate.setHint(getString(R.string.hint_race_date));
             inputLayoutTrainingDescription.setHint(getString(R.string.hint_race_description));
@@ -149,7 +161,20 @@ public class NewSportEvent extends Fragment {
             ((MainActivity)getActivity()).getCollapsingToolbarLayout().
                     setTitle(getString(R.string.new_training));
         }
-
+        if(args != null) {
+            currentPosition = getArguments().getInt(ListFragmentSportEvent.MODIFY_EVENT_TAG);
+            currentSportEvent = ((MainActivity)getActivity()).
+                    getSportEvent(navigationMenu).get(currentPosition);
+            navigationMenu = currentSportEvent.getType(getResources());
+            SportsEventType sportsEventType = currentSportEvent.getSportEventType(getResources(),
+                    navigationMenu);
+            inputTrainingName.setText(currentSportEvent.getName());
+            inputTrainingDescription.setText(currentSportEvent.getDescription());
+            inputTrainingDate.setText(dateFormatter.format(currentSportEvent.getDate()));
+            inputTrainingAddress.setText(currentSportEvent.getAddress());
+            inputSportType.setSelection(sportsEventType.getPosition());
+        }
+        setDateFields();
         return view;
 
     }
@@ -163,16 +188,18 @@ public class NewSportEvent extends Fragment {
             return;
         }
 
-        SportEvent newTraining = new SportEvent();
-        newTraining.setName(inputTrainingName.getText().toString());
-        newTraining.setDescription(inputTrainingDescription.getText().toString());
-        newTraining.setSportType(sportEventTypes[inputSportType.getSelectedItemPosition()]);
-        newTraining.setType(getString(sportEventType.getNameID()));
-        newTraining.setAddress(inputTrainingAddress.getText().toString());
-        newTraining.setDate(trainingDate);
-        newTraining.saveEventually();
+        if(currentSportEvent == null) {
+            currentSportEvent = new SportEvent();
+        }
+        currentSportEvent.setName(inputTrainingName.getText().toString());
+        currentSportEvent.setDescription(inputTrainingDescription.getText().toString());
+        currentSportEvent.setSportType(sportEventTypes[inputSportType.getSelectedItemPosition()]);
+        currentSportEvent.setType(getString(navigationMenu.getNameID()));
+        currentSportEvent.setAddress(inputTrainingAddress.getText().toString());
+        currentSportEvent.setDate(trainingDate);
+        currentSportEvent.saveEventually();
         try {
-            newTraining.pin();
+            currentSportEvent.pin();
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -186,8 +213,13 @@ public class NewSportEvent extends Fragment {
                 datePickerDialog.show();
             }
         });
-
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = null;
+        if(currentSportEvent != null ) {
+            calendar = USMAApplication.DateToCalendar(currentSportEvent.getDate());
+        }else {
+            calendar = Calendar.getInstance();
+        }
+        trainingDate = calendar.getTime();
         datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -226,7 +258,7 @@ public class NewSportEvent extends Fragment {
     private void closeNewTraining() {
         //FragmentManager fm = getActivity().getFragmentManager();
         //fm.beginTransaction().remove(this).commit();
-        ((MainActivity)getActivity()).selectItem(sportEventType.getId() + 1);
+        ((MainActivity)getActivity()).selectItem(navigationMenu.getId() + 1);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -102,6 +102,9 @@
     <string name="err_msg_training_name">Entrer le nom de la séance</string>
     <string name="err_msg_training_date">Entrer la date de la séance</string>
 
+    <string name="modify">Modifier</string>
+    <string name="delete">Supprimer</string>
+
 
 
 </resources>

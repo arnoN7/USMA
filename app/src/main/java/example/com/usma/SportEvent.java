@@ -66,9 +66,9 @@ public class SportEvent extends ParseObject {
         put(SPORT_TYPE, sportType);
     }
 
-    public SportsEventRaceType getSportEventRaceType(Resources resources) {
+    public SportsEventType getSportEventType(Resources resources, NavigationMenu navigationMenu) {
         String sSportType = getString(SPORT_TYPE);
-        return SportsEventRaceType.getSportTypeByName(sSportType, resources);
+        return SportsEventType.getSportTypeByName(sSportType, resources, navigationMenu);
     }
 
 

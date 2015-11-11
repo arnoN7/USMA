@@ -1,9 +1,11 @@
 package example.com.usma;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.os.Bundle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
  */
 public class ListFragmentSportEvent extends ListFragment{
 
-    private List<SportEvent> sportEvents;
+    public static final String MODIFY_EVENT_TAG = "modifyEventTag";
     private NavigationMenu sportEventsType;
 
     public static ListFragmentSportEvent newInstance(NavigationMenu sportEventType) {
@@ -25,18 +27,33 @@ public class ListFragmentSportEvent extends ListFragment{
     @Override
     public void newItemAction() {
         //update the main content by replacing fragments
+        startSportEventFragment(getFragmentManager(), sportEventsType, getActivity(), null);
+    }
+
+    private static void startSportEventFragment(FragmentManager fragmentManager,
+                                               NavigationMenu sportEventsType, Activity activity,
+                                                Bundle args) {
+        //update the main content by replacing fragments
         final Fragment fragment = NewSportEvent.newInstance(sportEventsType);
-        FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
+        if (args != null) {
+            fragment.setArguments(args);
+        }
         if(sportEventsType == NavigationMenu.RACES) {
             ft.replace(R.id.content_frame, fragment, MainActivity.LIST_FRAGMENT_NEW_RACE);
-            ((MainActivity)getActivity()).setCurrentFragmentTag(MainActivity.LIST_FRAGMENT_NEW_RACE);
+            ((MainActivity)activity).setCurrentFragmentTag(MainActivity.LIST_FRAGMENT_NEW_RACE);
         } else if (sportEventsType == NavigationMenu.TRAINING) {
             ft.replace(R.id.content_frame, fragment, MainActivity.LIST_FRAGMENT_NEW_TRAINING);
-            ((MainActivity)getActivity()).setCurrentFragmentTag(MainActivity.
+            ((MainActivity)activity).setCurrentFragmentTag(MainActivity.
                     LIST_FRAGMENT_NEW_TRAINING);
         }
         ft.commit();
+    }
+
+    public void modifyItem(int position) {
+        Bundle args = new Bundle();
+        args.putInt(ListFragmentSportEvent.MODIFY_EVENT_TAG, position);
+        startSportEventFragment(getFragmentManager(), sportEventsType, getActivity(), args);
     }
 
     @Override
