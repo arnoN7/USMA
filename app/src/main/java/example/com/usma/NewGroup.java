@@ -12,13 +12,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseRole;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 
@@ -37,6 +40,7 @@ public class NewGroup extends Fragment {
     private EditText inputGroupName, inputGroupDescription;
     private Button saveButton;
     private ParseRole adminRole;
+    private ProgressBar progressBar;
 
     /**
      * Use this factory method to create a new instance of
@@ -84,7 +88,7 @@ public class NewGroup extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_new_group, container, false);
+        final View view = inflater.inflate(R.layout.fragment_new_group, container, false);
         inputLayoutGroupName = (TextInputLayout) view.findViewById(R.id.input_layout_group_name);
         inputLayoutGroupDescription = (TextInputLayout) view.
                 findViewById(R.id.input_layout_group_description);
@@ -96,10 +100,13 @@ public class NewGroup extends Fragment {
                 setTitle(getString(R.string.new_group));
 
         saveButton = (Button) view.findViewById(R.id.save_group);
+        progressBar = (ProgressBar) view.findViewById(R.id.new_group_progress);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 submitForm();
             }
         });
@@ -112,10 +119,20 @@ public class NewGroup extends Fragment {
         }
         ParseACL roleACL = new ParseACL();
         roleACL.setPublicReadAccess(true);
+        roleACL.setPublicWriteAccess(true);
         ParseRole newRole = new ParseRole(inputGroupName.getText().toString(),roleACL);
+        newRole.getUsers().add(ParseUser.getCurrentUser());
         newRole.put(GroupUsers.DESCRIPTION, inputGroupDescription.getText().toString());
-        newRole.saveEventually();
-        closeNewGroup();
+        progressBar.setVisibility(View.VISIBLE);
+        saveButton.setVisibility(View.GONE);
+        newRole.pinInBackground();
+        newRole.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                closeNewGroup();
+            }
+        });
+
     }
 
     private void closeNewGroup() {

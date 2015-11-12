@@ -63,6 +63,33 @@
                 android:layout_below="@+id/item_name"
                 android:textSize="12sp"
                 />
+            <Button
+                android:id="@+id/sign_in_group_button"
+                android:text="@string/action_sign_in_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_light"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="@dimen/padding_small"
+                android:paddingTop="@dimen/padding_small"
+                android:paddingBottom="@dimen/padding_small"
+                android:layout_below="@id/sport_event_name"
+                android:layout_centerHorizontal="true"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                />
+            <ProgressBar android:id="@+id/sign_in_group_progress" style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp" android:visibility="gone"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="@dimen/padding_small"
+                android:paddingTop="@dimen/padding_small"
+                android:paddingBottom="@dimen/padding_small"
+                android:layout_below="@id/sport_event_name"
+                android:layout_centerHorizontal="true"/>
             <TextView
                 android:layout_width="@dimen/date_shower_width_list"
                 android:layout_height="wrap_content"

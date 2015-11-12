@@ -1,19 +1,27 @@
 package example.com.usma;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseRole;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.Calendar;
 import java.util.List;
@@ -36,7 +44,9 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
                 mTextViewDay, mTextViewDayOfWeek, mTextViewTypeSportEvent;
         public ImageView mIconItem;
         private ClickListener clickListener;
+        private Button mSignInGroupButton;
         private PopupMenu.OnMenuItemClickListener onMenuItemClickListener;
+        private ProgressBar progressBar;
 
         public ItemViewHolder(View v, final Context context) {
             super(v);
@@ -48,6 +58,8 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
             mTextViewDayOfWeek = (TextView) v.findViewById(R.id.day_of_week_list);
             mIconItem = (ImageView) v.findViewById(R.id.image_item);
             mTextViewTypeSportEvent = (TextView) v.findViewById(R.id.type_details);
+            mSignInGroupButton = (Button) v.findViewById(R.id.sign_in_group_button);
+            progressBar = (ProgressBar) v.findViewById(R.id.sign_in_group_progress);
 
             v.setClickable(true);
             v.setOnClickListener(this);
@@ -57,9 +69,7 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.setHeaderTitle("Select The Action");
-            menu.add(0, v.getId(), 0, "Call");//groupId, itemId, order, title
-            menu.add(0, v.getId(), 0, "SMS");
+
         }
 
         /* Interface for handling clicks - both normal and long ones. */
@@ -246,16 +256,80 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
 
     public static class ListItemAdapterGroup extends ListItemAdapter {
         private List<ParseRole> groups;
+
         public ListItemAdapterGroup(Context context) {
             super(context);
-            this.groups = ((MainActivity) context).getGroups();
+            if (context != null) {
+                this.groups = ((MainActivity) context).getGroups(false);
+            }
         }
 
         @Override
-        public void onBindViewHolder(ItemViewHolder holder, int position) {
+        public void onBindViewHolder(final ItemViewHolder holder, final int position) {
             ParseRole group = groups.get(position);
             holder.mTextViewName.setText(group.getString(GroupUsers.NAME));
             holder.mTextViewDescription.setText(group.getString(GroupUsers.DESCRIPTION));
+            holder.mSignInGroupButton.setVisibility(View.VISIBLE);
+            group.getUsers().getQuery().
+                    findInBackground(new FindCallback<ParseUser>() {
+                        @Override
+                        public void done(List<ParseUser> users, ParseException e) {
+                            for (int i = 0; i < users.size(); i++) {
+                                if (users.get(i).getUsername().
+                                        equals(ParseUser.getCurrentUser().getUsername())) {
+                                    setSignedInGroup(holder);
+                                    break;
+                                }
+                            }
+                        }
+                    });
+
+            holder.mSignInGroupButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    holder.mSignInGroupButton.setVisibility(View.GONE);
+                    holder.progressBar.setVisibility(View.VISIBLE);
+                    ParseRole group = groups.get(position);
+                    if (holder.mSignInGroupButton.getText().toString().
+                            equals(context.getString(R.string.action_sign_in_group))) {
+                        group.getUsers().add(ParseUser.getCurrentUser());
+                        Toast.makeText(context, group.getName() + " group " + position, Toast.LENGTH_SHORT).show();
+                    } else {
+                        group.getUsers().remove(ParseUser.getCurrentUser());
+                    }
+                    try {
+                        group.save();
+                        ((MainActivity) context).initFragments();
+                        holder.progressBar.setVisibility(View.GONE);
+                        holder.mSignInGroupButton.setVisibility(View.VISIBLE);
+                        if (holder.mSignInGroupButton.getText().toString().
+                                equals(context.getString(R.string.action_sign_in_group))) {
+                            setSignedInGroup(holder);
+                        } else {
+                            setSignedOutGroup(holder);
+                        }
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+
+        private void setSignedOutGroup(ItemViewHolder holder) {
+            holder.mSignInGroupButton.setText(context.getString(R.string.action_sign_in_group));
+            holder.mSignInGroupButton.setBackground(context.getResources().
+                    getDrawable(R.drawable.button_light));
+            holder.mSignInGroupButton.setTextColor(context.getResources().getColor(R.color.black));
+
+        }
+
+        private void setSignedInGroup(ItemViewHolder holder) {
+            holder.mSignInGroupButton.setText(context.
+                    getString(R.string.signed_in_group));
+            holder.mSignInGroupButton.setBackground(context.getResources().
+                    getDrawable(R.drawable.button_dark));
+            holder.mSignInGroupButton.setTextColor(context.getResources().getColor(R.color.white));
         }
 
         @Override

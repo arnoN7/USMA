@@ -3,6 +3,7 @@ package example.com.usma;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -84,7 +86,7 @@ public class NewUser extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_new_user, container, false);
+        final View view = inflater.inflate(R.layout.fragment_new_user, container, false);
         inputLayoutName = (TextInputLayout) view.findViewById(R.id.input_layout_name);
         inputLayoutFirstname = (TextInputLayout) view.findViewById(R.id.input_layout_firstname);
         inputLayoutEmail = (TextInputLayout) view.findViewById(R.id.input_layout_email);
@@ -106,6 +108,8 @@ public class NewUser extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 submitForm();
             }
         });

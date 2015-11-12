@@ -40,7 +40,7 @@
                 >
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/USMABlue"
                 android:id="@+id/title_details"

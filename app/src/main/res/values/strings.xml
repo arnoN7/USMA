@@ -63,10 +63,12 @@
     <string name="details">Détails</string>
     <!-- NewRace Strings -->
     <string name="hint_race_name">Nom de la course</string>
-    <string name="hint_race_description">Détail sur la course (nombre de km, dénivelé, heure ...) </string>
+    <string name="hint_race_overview">Aperçu de la course (nombre de km, dénivelé,
+        heure ...) </string>
     <string name="race_type">Type de course : </string>
     <string name="hint_race_date">Date</string>
-    <string name="hint_race_address">Lieu de la course</string>
+    <string name="hint_race_address">Détails pratiques (inscription, adresse, horaires,
+        ravitaillements...)</string>
     <string name="save_race">Enregistrer la course</string>
     <string name="new_race">Nouvelle course</string>
 
@@ -104,6 +106,8 @@
 
     <string name="modify">Modifier</string>
     <string name="delete">Supprimer</string>
+    <string name="action_sign_in_group">S\'inscrire</string>
+    <string name="signed_in_group">Inscrit</string>
 
 
 

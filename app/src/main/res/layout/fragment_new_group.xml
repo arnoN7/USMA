@@ -44,6 +44,12 @@
             android:text="@string/save_group"
             android:id="@+id/save_group" />
 
+        <ProgressBar android:id="@+id/new_group_progress" style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginLeft="130dp"
+            android:layout_marginTop="10dp"/>
+
 
     </LinearLayout>
 

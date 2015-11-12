@@ -6,25 +6,33 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.parse.ParseACL;
 import com.parse.ParseException;
+import com.parse.ParseRole;
+import com.parse.ParseUser;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -53,7 +61,9 @@ public class NewSportEvent extends Fragment {
     private NavigationMenu navigationMenu;
     private SportEvent currentSportEvent;
     private int currentPosition = 0;
-    private RecyclerView mGroups;
+    private ListView mGroups;
+    private List<Integer> selectedGroupId;
+    private ListGroupAdapter groupAdapter;
 
 
     /**
@@ -95,13 +105,14 @@ public class NewSportEvent extends Fragment {
         // Inflate the layout for this fragment
         Bundle args = getArguments();
         currentSportEvent = null;
+        selectedGroupId = new ArrayList<>();
         if (savedInstanceState != null &&
                 savedInstanceState.containsKey(ListFragmentSportEvent.MODIFY_EVENT_TAG)) {
             currentPosition = savedInstanceState.getInt(ListFragmentSportEvent.MODIFY_EVENT_TAG);
             currentSportEvent = ((MainActivity)getActivity()).
                     getSportEvent(navigationMenu).get(currentPosition);
         }
-        View view =inflater.inflate(R.layout.fragment_sport_event, container, false);
+        final View view =inflater.inflate(R.layout.fragment_sport_event, container, false);
         int arraySportEventTypesID;
         inputSportType = (Spinner) view.findViewById(R.id.sports_type);
         if (navigationMenu == NavigationMenu.RACES) {
@@ -130,11 +141,23 @@ public class NewSportEvent extends Fragment {
         inputTrainingDate = (EditText) view.findViewById(R.id.input_training_date);
         inputTrainingAddress = (EditText) view.findViewById(R.id.input_training_address);
         textSportEventTrainingType = (TextView) view.findViewById(R.id.text_sport_event_type);
+        mGroups = (ListView) view.findViewById(R.id.RecyclerViewNewSportEvent);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        List<ParseRole> groups = ((MainActivity)getActivity()).getGroups(false);
+        groupAdapter = new ListGroupAdapter(getActivity(), groups);
+        mGroups.setAdapter(groupAdapter);
+        //getHeight to resize the listView...
+        int height = groupAdapter.getHeight(mGroups);
+        ViewGroup.LayoutParams params = mGroups.getLayoutParams();
+        params.height = groupAdapter.getHeight(mGroups);
+        mGroups.setLayoutParams(params);
 
         saveButton = (Button) view.findViewById(R.id.save_race);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 submitForm();
             }
         });
@@ -145,7 +168,7 @@ public class NewSportEvent extends Fragment {
         if (navigationMenu == NavigationMenu.RACES) {
             inputLayoutTrainingName.setHint(getString(R.string.hint_race_name));
             inputLayoutTrainingDate.setHint(getString(R.string.hint_race_date));
-            inputLayoutTrainingDescription.setHint(getString(R.string.hint_race_description));
+            inputLayoutTrainingDescription.setHint(getString(R.string.hint_race_overview));
             inputLayoutTrainingAddress.setHint(getString(R.string.hint_race_address));
             textSportEventTrainingType.setText(getString(R.string.race_type));
             saveButton.setText(getString(R.string.save_race));
@@ -173,6 +196,7 @@ public class NewSportEvent extends Fragment {
             inputTrainingDate.setText(dateFormatter.format(currentSportEvent.getDate()));
             inputTrainingAddress.setText(currentSportEvent.getAddress());
             inputSportType.setSelection(sportsEventType.getPosition());
+            groupAdapter.setChecked(currentSportEvent.getGroups(false));
         }
         setDateFields();
         return view;
@@ -197,15 +221,38 @@ public class NewSportEvent extends Fragment {
         currentSportEvent.setType(getString(navigationMenu.getNameID()));
         currentSportEvent.setAddress(inputTrainingAddress.getText().toString());
         currentSportEvent.setDate(trainingDate);
-        currentSportEvent.saveEventually();
+        setSportEventGroups();
         try {
+            //public read access need to be True to read it in localdatastore
+            currentSportEvent.getACL().setReadAccess(ParseUser.getCurrentUser(),true);
+            currentSportEvent.saveEventually();
             currentSportEvent.pin();
+            //set false for cloud
+            //currentSportEvent.getACL().setPublicReadAccess(false);
+
         } catch (ParseException e) {
             e.printStackTrace();
         }
         closeNewTraining();
 
     }
+
+    private void setSportEventGroups() {
+        SparseBooleanArray checkedGroups = groupAdapter.getmCheckStates();
+        List<ParseRole> groups = ((MainActivity)getActivity()).getGroups(false);
+        ParseACL acl = new ParseACL();
+        for (int i = 0; i < groups.size(); i++) {
+            if(checkedGroups.get(i) == true) {
+                //acl.setRoleWriteAccess(groups.get(i), true);
+                //acl.setRoleReadAccess(groups.get(i), true);
+                acl.setPublicReadAccess(false);
+                acl.setPublicWriteAccess(false);
+                currentSportEvent.addGroup(groups.get(i));
+            }
+        }
+        currentSportEvent.setACL(acl);
+    }
+
     private void setDateFields(){
         inputTrainingDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -323,6 +370,18 @@ public class NewSportEvent extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
+    }
+
+    public void checkGroup(int id) {
+        selectedGroupId.add(id);
+    }
+
+    public void uncheckGroup(int id) {
+        for (int i = 0; i < selectedGroupId.size(); i++) {
+            if(selectedGroupId.get(i) == id) {
+                selectedGroupId.remove(i);
+            }
+        }
     }
 
 }

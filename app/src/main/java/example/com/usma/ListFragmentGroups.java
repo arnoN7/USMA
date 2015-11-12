@@ -63,7 +63,9 @@ public class ListFragmentGroups extends ListFragment {
     }
 
     public void notifyDataSetChanged() {
-        mAdapter = new ListItemAdapter.ListItemAdapterGroup(getActivity());
-        mRecyclerView.setAdapter(mAdapter);
+        if(mRecyclerView != null) {
+            mAdapter = new ListItemAdapter.ListItemAdapterGroup(getActivity());
+            mRecyclerView.setAdapter(mAdapter);
+        }
     }
 }

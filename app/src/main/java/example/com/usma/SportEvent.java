@@ -3,9 +3,15 @@ package example.com.usma;
 import android.content.res.Resources;
 
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseRelation;
+import com.parse.ParseRole;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Arnaud Rover on 30/10/2015.
@@ -18,7 +24,8 @@ public class SportEvent extends ParseObject {
     public static final String MENU_TYPE = "type";
     public static final String DETAILS = "address";
     public static final String SPORT_TYPE = "sport_type";
-
+    public static final String GROUPS = "groups";
+    private ParseRelation<ParseRole> relation;
 
     public String getName() {
         return getString(NAME);
@@ -70,6 +77,25 @@ public class SportEvent extends ParseObject {
         String sSportType = getString(SPORT_TYPE);
         return SportsEventType.getSportTypeByName(sSportType, resources, navigationMenu);
     }
+    public void addGroup(ParseRole group) {
+        getRelation(GROUPS).add(group);
+    }
+    public ParseRelation<ParseRole> getGroupsRelation() {
+        return getRelation(GROUPS);
+    }
+    public List<ParseRole> getGroups(boolean  refresh) {
+        try {
+            ParseQuery<ParseRole> query = getGroupsRelation().getQuery();
+            if (!refresh) {
+                query = query.fromLocalDatastore();
+            }
+            return query.find();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+    }
+
 
 
 

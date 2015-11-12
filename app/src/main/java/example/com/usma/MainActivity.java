@@ -58,6 +58,10 @@ public class MainActivity extends AppCompatActivity implements
     private static final String CURRENT_FRAGMENT_TAG = "currentFragmentTag";
     private static final String CURRENT_TITLE_TAG = "currentTitleTag";
     private static final String CURRENT_HEADER_IMAGE_ID_TAG = "currentHeaderImageTag";
+    public static final String PARSE_PIN_GROUP_TAG = "GROUPS";
+    public static final String PARSE_PIN_USER_TAG = "USERS";
+    public static final String PARSE_PIN_USERS_IN_GROUPS = "UsersInGroups";
+    public static final String PARSE_PIN_RACE_TAG = "RACE";
 
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
@@ -236,33 +240,75 @@ public class MainActivity extends AppCompatActivity implements
         return fragments;
     }
 
-    public void setUsers(List<ParseUser> users) {
-        ParseUser.pinAllInBackground(users);
+    public void setUsers(final List<ParseUser> users) {
+        try {
+            ParseUser.unpinAll(PARSE_PIN_USER_TAG);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        ParseUser.pinAllInBackground(PARSE_PIN_USER_TAG, users);
         if(currentFragmentTag.equals(LIST_FRAGMENT_USER)) {
             ((ListFragment) fragments.get(NavigationMenu.USERS.getId())).notifyDataSetChanged();
         }
     }
 
-    public void setGroups(List<ParseRole> groups) {
-        ParseRole.pinAllInBackground(groups);
+    public void setGroups(final List<ParseRole> groups) {
+        try {
+            ParseRole.unpinAll(PARSE_PIN_GROUP_TAG);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        ParseRole.pinAllInBackground(PARSE_PIN_GROUP_TAG, groups);
         if (currentFragmentTag.equals(LIST_FRAGMENT_GROUPS)) {
             ((ListFragment) fragments.get(NavigationMenu.GROUPS.getId())).notifyDataSetChanged();
         }
     }
 
-    public void setTrainings(List<SportEvent> trainings) {
+    public void setTrainings(final List<SportEvent> trainings, boolean online) {
+        for (SportEvent sportEvent: trainings
+             ) {
+            sportEvent.getACL().setReadAccess(ParseUser.getCurrentUser(), true);
+            pinSportEventGroups(online, sportEvent);
+        }
         SportEvent.pinAllInBackground(trainings);
         if (currentFragmentTag.equals(LIST_FRAGMENT_TRAINING)) {
             ((ListFragment) fragments.get(NavigationMenu.TRAINING.getId())).notifyDataSetChanged();
         }
     }
 
-    public void setRaces(List<SportEvent> races) {
-        SportEvent.pinAllInBackground(races);
+    public void setRaces(final List<SportEvent> races, boolean online) {
+        try {
+            SportEvent.unpinAll(PARSE_PIN_RACE_TAG);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        SportEvent.pinAllInBackground(PARSE_PIN_RACE_TAG, races);
+        for (SportEvent sportEvent: races
+                ) {
+            sportEvent.getACL().setReadAccess(ParseUser.getCurrentUser(), true);
+            pinSportEventGroups(online, sportEvent);
+
+        }
         if (currentFragmentTag.equals(LIST_FRAGMENT_RACE)) {
             ((ListFragment) fragments.get(NavigationMenu.RACES.getId())).notifyDataSetChanged();
         }
     }
+
+    private void pinSportEventGroups(boolean online, SportEvent sportEvent) {
+        if(online) {
+            sportEvent.getGroupsRelation().getQuery().findInBackground(new FindCallback<ParseRole>() {
+                @Override
+                public void done(List<ParseRole> groups, ParseException e) {
+                    ParseRole.pinAllInBackground(groups);
+                }
+            });
+        }
+        else
+        {
+            ParseRole.pinAllInBackground(sportEvent.getGroups(false));
+        }
+    }
+
     private void initOnlineIfPossible() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(this.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
@@ -326,14 +372,14 @@ public class MainActivity extends AppCompatActivity implements
                                 fragment = ListFragmentSportEvent.newInstance(navigationMenu[i]);
                             }
                             fragments.add(fragment);
-                            setRaces(querySportEvent.find());
+                            setRaces(querySportEvent.find(), false);
                         } else {
                             fragment = getLocalFragmentByTag(LIST_FRAGMENT_TRAINING);
                             if(fragment == null) {
                                 fragment = ListFragmentSportEvent.newInstance(navigationMenu[i]);
                             }
                             fragments.add(fragment);
-                            setTrainings(querySportEvent.find());
+                            setTrainings(querySportEvent.find(), false);
                         }
 
 
@@ -351,12 +397,13 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void initFragments () {
+    public void initFragments () {
         fragments = new ArrayList<>();
         try {
             ParseUser.unpinAll();
             ParseRole.unpinAll();
             SportEvent.unpinAll();
+            ParseUser.unpinAllInBackground(PARSE_PIN_USERS_IN_GROUPS);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -387,6 +434,21 @@ public class MainActivity extends AppCompatActivity implements
                         public void done(List<ParseRole> listRole, ParseException e) {
                             adminRole = ((ListFragmentGroups) fragments.get(NavigationMenu.GROUPS.
                                     getId())).getAdminRole();
+                            try {
+                                ParseUser.unpinAll(PARSE_PIN_USERS_IN_GROUPS);
+                            } catch (ParseException e1) {
+                                e1.printStackTrace();
+                            }
+                            for (ParseRole group : listRole
+                                    ) {
+                                group.getUsers().getQuery().findInBackground(new FindCallback<ParseUser>() {
+                                    @Override
+                                    public void done(List<ParseUser> users, ParseException e) {
+                                        //Pin all users attached to a group
+                                        ParseUser.pinAllInBackground(PARSE_PIN_USERS_IN_GROUPS, users);
+                                    }
+                                });
+                            }
                             setGroups(listRole);
                             Toast debug = Toast.makeText(getApplication(), "Groups Loaded",
                                     Toast.LENGTH_LONG);
@@ -410,9 +472,9 @@ public class MainActivity extends AppCompatActivity implements
                             if ((sportEvents != null) && (sportEvents.size() > 0)) {
                                 sportEventType = sportEvents.get(0).getType(getResources());
                                 if (sportEventType == NavigationMenu.RACES) {
-                                    setRaces(sportEvents);
+                                    setRaces(sportEvents, true);
                                 } else if (sportEventType == NavigationMenu.TRAINING) {
-                                    setTrainings(sportEvents);
+                                    setTrainings(sportEvents, true);
                                 }
                                 Toast debug = Toast.makeText(getApplication(),
                                         getString(sportEventType.getNameID()) + " loaded",
@@ -507,11 +569,15 @@ public class MainActivity extends AppCompatActivity implements
      * Get Roles from local datastore
      * @return
      */
-    public List<ParseRole> getGroups() {
+    public List<ParseRole> getGroups(boolean refresh) {
         ParseQuery<ParseRole> queryGroups = ParseRole.getQuery();
         List<ParseRole> groups = null;
         try {
-            groups = queryGroups.fromLocalDatastore().find();
+            if(!refresh) {
+                groups = queryGroups.fromLocalDatastore().find();
+            } else {
+                groups = queryGroups.find();
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }

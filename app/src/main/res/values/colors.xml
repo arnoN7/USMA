@@ -16,6 +16,7 @@
     <item name="USMAAccent" type="color">#3195ff</item>
     <item name="white" type="color">#FFFFFF</item>
     <item name="greyUSMA" type="color">#b4666666</item>
+    <item name="black" type="color">#000000</item>
 
     <integer-array name="androidcolors">
         <item>@color/blue</item>
