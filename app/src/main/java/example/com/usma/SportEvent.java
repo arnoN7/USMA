@@ -25,6 +25,7 @@ public class SportEvent extends ParseObject {
     public static final String DETAILS = "address";
     public static final String SPORT_TYPE = "sport_type";
     public static final String GROUPS = "groups";
+    public static final String COMMENTLIST = "comments";
     private ParseRelation<ParseRole> relation;
 
     public String getName() {
@@ -94,6 +95,14 @@ public class SportEvent extends ParseObject {
             e.printStackTrace();
             throw new RuntimeException();
         }
+    }
+
+    public void addComment(CommentSportEvent comment) {
+        getComments().add(comment);
+    }
+
+    public ArrayList<CommentSportEvent> getComments() {
+        return (ArrayList<CommentSportEvent>) get(COMMENTLIST);
     }
 
 

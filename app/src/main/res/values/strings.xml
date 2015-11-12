@@ -67,7 +67,7 @@
         heure ...) </string>
     <string name="race_type">Type de course : </string>
     <string name="hint_race_date">Date</string>
-    <string name="hint_race_address">Détails pratiques (inscription, adresse, horaires,
+    <string name="hint_race_details">Détails pratiques (inscription, adresse, horaires,
         ravitaillements...)</string>
     <string name="save_race">Enregistrer la course</string>
     <string name="new_race">Nouvelle course</string>
@@ -84,10 +84,12 @@
 
     <!-- NewTraining Strings -->
     <string name="hint_training_name">Nom de l\'entraînement</string>
-    <string name="hint_training_description">Détail (nombre de km, fractionnés, récup ...) </string>
+    <string name="hint_training_overview">Aperçu de l\'entraînement (nombre de km, dénivelé,
+        heure ...) </string>
     <string name="training_type">Type d\'entrainement : </string>
     <string name="hint_training_date">Date</string>
-    <string name="hint_training_address">Lieu de la séance</string>
+    <string name="hint_training_details">Détails pratiques (Adresse, horaires,
+        durée...)</string>
     <string name="save_training">Enregistrer la séance</string>
     <string name="new_training">Nouvel entraînement</string>
 

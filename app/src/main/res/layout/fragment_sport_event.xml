@@ -66,17 +66,21 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/input_layout_training_address"
+                android:id="@+id/input_layout_training_details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/input_layout_training_date"
+                android:scrollbars="vertical"
                 android:layout_alignParentLeft="true">
                 <EditText
                     android:id="@+id/input_training_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:inputType="textPostalAddress" />
+                    android:inputType="textMultiLine"
+                    android:lines="4"
+                    android:minLines="3"
+                    android:gravity="top|left"
+                    android:maxLines="10" />
             </android.support.design.widget.TextInputLayout>
 
             <ListView
@@ -84,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
-                android:layout_below="@id/input_layout_training_address"
+                android:layout_below="@id/input_layout_training_details"
                 android:layout_marginLeft="@dimen/padding_medium"
                 android:background="#ffffff" />
 

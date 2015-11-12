@@ -133,7 +133,7 @@ public class NewSportEvent extends Fragment {
         inputLayoutTrainingDate = (TextInputLayout) view.findViewById(R.id.
                 input_layout_training_date);
         inputLayoutTrainingAddress = (TextInputLayout) view.findViewById(R.
-                id.input_layout_training_address);
+                id.input_layout_training_details);
         inputLayoutTrainingDescription = (TextInputLayout) view.
                 findViewById(R.id.input_layout_training_description);
         inputTrainingName = (EditText) view.findViewById(R.id.input_training_name);
@@ -169,7 +169,7 @@ public class NewSportEvent extends Fragment {
             inputLayoutTrainingName.setHint(getString(R.string.hint_race_name));
             inputLayoutTrainingDate.setHint(getString(R.string.hint_race_date));
             inputLayoutTrainingDescription.setHint(getString(R.string.hint_race_overview));
-            inputLayoutTrainingAddress.setHint(getString(R.string.hint_race_address));
+            inputLayoutTrainingAddress.setHint(getString(R.string.hint_race_details));
             textSportEventTrainingType.setText(getString(R.string.race_type));
             saveButton.setText(getString(R.string.save_race));
             ((MainActivity)getActivity()).getCollapsingToolbarLayout().
@@ -177,8 +177,8 @@ public class NewSportEvent extends Fragment {
         } else {
             inputLayoutTrainingName.setHint(getString(R.string.hint_training_name));
             inputLayoutTrainingDate.setHint(getString(R.string.hint_training_date));
-            inputLayoutTrainingDescription.setHint(getString(R.string.hint_training_description));
-            inputLayoutTrainingAddress.setHint(getString(R.string.hint_training_address));
+            inputLayoutTrainingDescription.setHint(getString(R.string.hint_training_overview));
+            inputLayoutTrainingAddress.setHint(getString(R.string.hint_training_details));
             textSportEventTrainingType.setText(getString(R.string.training_type));
             saveButton.setText(getString(R.string.save_training));
             ((MainActivity)getActivity()).getCollapsingToolbarLayout().
@@ -243,8 +243,8 @@ public class NewSportEvent extends Fragment {
         ParseACL acl = new ParseACL();
         for (int i = 0; i < groups.size(); i++) {
             if(checkedGroups.get(i) == true) {
-                //acl.setRoleWriteAccess(groups.get(i), true);
-                //acl.setRoleReadAccess(groups.get(i), true);
+                acl.setRoleWriteAccess(groups.get(i), true);
+                acl.setRoleReadAccess(groups.get(i), true);
                 acl.setPublicReadAccess(false);
                 acl.setPublicWriteAccess(false);
                 currentSportEvent.addGroup(groups.get(i));
