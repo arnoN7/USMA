@@ -26,9 +26,7 @@ public class USMAApplication extends Application{
 
         // add todo's subclass
         ParseObject.registerSubclass(SportEvent.class);
-
-
-
+        ParseObject.registerSubclass(CommentSportEvent.class);
 
         // enable the Local Datastore
         Parse.enableLocalDatastore(getApplicationContext());

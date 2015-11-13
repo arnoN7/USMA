@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:cv_comment="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/USMAPale"
+        android:paddingTop="@dimen/padding_small"
+        android:layout_marginTop="@dimen/padding_small"
+        android:paddingBottom="@dimen/padding_small"
+        android:layout_marginLeft="@dimen/padding_large"
+        android:layout_marginRight="@dimen/padding_large"
+        card_view:cardCornerRadius="4dp"
+        android:id="@+id/cv_comment">
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/comment_author"
+                android:textStyle="bold"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/USMABlue"
+                android:layout_marginLeft="@dimen/padding_medium"
+                android:layout_alignParentTop="true"
+                android:text="Arnaud Rover"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/comment_message"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/USMABlueDark"
+                android:text="blabkabkfkldbjfdbjkl"
+                android:layout_below="@id/comment_author"
+                android:paddingLeft="@dimen/padding_text_comment"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/comment_date"
+                android:textStyle="italic"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="18 oct 2015 16h30"
+                android:layout_below="@id/comment_message"
+                android:layout_marginRight="@dimen/padding_medium"
+                android:layout_alignParentRight="true"
+                />
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginLeft="@dimen/padding_medium"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/comment_message"
+                android:id="@+id/icon_comment"
+                android:src="@drawable/ic_comment_black_24dp"/>
+        </RelativeLayout>
+
+
+    </android.support.v7.widget.CardView>
+
+
+</LinearLayout>

@@ -95,7 +95,9 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
         public void onClick(View v) {
 
             // If not long clicked, pass last variable as false.
-            clickListener.onClick(v, getPosition(), false);
+            if(clickListener != null) {
+                clickListener.onClick(v, getPosition(), false);
+            }
         }
 
         @Override

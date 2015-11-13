@@ -403,6 +403,7 @@ public class MainActivity extends AppCompatActivity implements
             ParseUser.unpinAll();
             ParseRole.unpinAll();
             SportEvent.unpinAll();
+            CommentSportEvent.unpinAll();
             ParseUser.unpinAllInBackground(PARSE_PIN_USERS_IN_GROUPS);
         } catch (ParseException e) {
             e.printStackTrace();

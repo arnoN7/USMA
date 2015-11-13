@@ -111,6 +111,8 @@
     <string name="action_sign_in_group">S\'inscrire</string>
     <string name="signed_in_group">Inscrit</string>
 
+    <string name="hint_new_comment">Ecrivez un commentaire ...</string>
+
 
 
 </resources>

@@ -97,15 +97,4 @@ public class SportEvent extends ParseObject {
         }
     }
 
-    public void addComment(CommentSportEvent comment) {
-        getComments().add(comment);
-    }
-
-    public ArrayList<CommentSportEvent> getComments() {
-        return (ArrayList<CommentSportEvent>) get(COMMENTLIST);
-    }
-
-
-
-
 }

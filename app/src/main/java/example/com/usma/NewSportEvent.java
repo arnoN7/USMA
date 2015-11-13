@@ -147,7 +147,6 @@ public class NewSportEvent extends Fragment {
         groupAdapter = new ListGroupAdapter(getActivity(), groups);
         mGroups.setAdapter(groupAdapter);
         //getHeight to resize the listView...
-        int height = groupAdapter.getHeight(mGroups);
         ViewGroup.LayoutParams params = mGroups.getLayoutParams();
         params.height = groupAdapter.getHeight(mGroups);
         mGroups.setLayoutParams(params);

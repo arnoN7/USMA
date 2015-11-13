@@ -1,6 +1,10 @@
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="example.com.usma.ConsultSportEvent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="example.com.usma.ConsultSportEvent"
+    android:fillViewport="true">
 
     <RelativeLayout android:layout_width="match_parent" android:layout_height="match_parent">
         <TextView
@@ -40,7 +44,7 @@
                 >
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/USMABlue"
                 android:id="@+id/title_details"
@@ -95,6 +99,43 @@
             android:id="@+id/year_event"
             style="@style/date_light"
             android:text="2016"/>
+        <View style="@style/Divider"
+            android:layout_below="@id/card_view"
+            android:id="@+id/divider_comment"
+            android:layout_marginTop="@dimen/padding_large"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:paddingTop="@dimen/padding_medium"
+            android:id="@+id/comment_layout"
+            android:layout_below="@id/divider_comment"
+            android:scrollbars="none"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        </android.support.v7.widget.RecyclerView>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/new_comment_input_layout"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/button_new_comment"
+            android:layout_marginTop="100dp">
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_new_comment"
+                android:id="@+id/new_comment"/>
+        </android.support.design.widget.TextInputLayout>
+        <Button
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:id="@id/button_new_comment"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="@dimen/padding_large"
+            android:layout_alignBottom="@id/new_comment_input_layout"
+            android:background="@drawable/button_send"/>
+
 
 
 

@@ -104,8 +104,4 @@ public abstract class ListFragment extends Fragment {
     }
 
     public abstract void notifyDataSetChanged();
-
-    public void setmAdapter(RecyclerView.Adapter mAdapter) {
-        this.mAdapter = mAdapter;
-    }
 }
