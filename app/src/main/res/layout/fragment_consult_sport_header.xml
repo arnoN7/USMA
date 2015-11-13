@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/sport_event_name"
+            android:layout_alignParentTop="true"
+            android:textStyle="bold"
+            android:textColor="@color/USMABlue"
+            android:text="Nom course"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/sport_event_description"
+            android:layout_below="@id/sport_event_name"
+            android:textColor="@color/USMAAccent"
+            android:text="12km"
+            android:textStyle="italic"/>
+        <!-- A CardView that contains a TextView -->
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/card_view"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/day_of_week_event"
+            android:layout_marginLeft="@dimen/padding_medium"
+            android:layout_marginRight="@dimen/padding_medium"
+            android:paddingTop="@dimen/padding_medium"
+            card_view:cardCornerRadius="4dp"
+            android:layout_below="@id/sport_event_description">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_small"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/USMABlue"
+                    android:id="@+id/title_details"
+                    android:textStyle="bold"
+                    android:text="@string/details"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:id="@+id/sport_event_address"
+                    android:layout_below="@id/title_details"
+                    android:layout_marginTop="@dimen/padding_small"
+                    android:text="detaillllllls"/>
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:layout_width="@dimen/date_shower_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@id/day_of_week_event"
+            style="@style/date_dark"
+            android:layout_marginTop="@dimen/padding_small"
+            android:paddingTop="@dimen/padding_small"
+            android:paddingBottom="@dimen/padding_small"
+            android:layout_below="@id/sport_event_name"
+            android:text="Mercredi"/>
+        <TextView
+            android:layout_width="@dimen/date_shower_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/day_of_week_event"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/day_of_month_event"
+            style="@style/date_light"
+            android:text="25"/>
+        <TextView
+            android:layout_width="@dimen/date_shower_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/day_of_month_event"
+            android:id="@+id/month_event"
+            style="@style/date_light"
+            android:text="Janvier"/>
+
+        <TextView
+            android:layout_width="@dimen/date_shower_width"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/month_event"
+            android:id="@+id/year_event"
+            style="@style/date_light"
+            android:text="2016"/>
+        <View style="@style/Divider"
+            android:layout_below="@id/card_view"
+            android:id="@+id/divider_comment"
+            android:layout_marginTop="@dimen/padding_large"/>
+
+        <ProgressBar android:id="@+id/comment_loading_progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:layout_below="@id/divider_comment"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/comment_loading"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_below="@id/comment_loading_progress"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:id="@+id/comment_loading_title"/>
+</RelativeLayout>

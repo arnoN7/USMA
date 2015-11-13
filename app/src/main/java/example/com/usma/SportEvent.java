@@ -2,12 +2,14 @@ package example.com.usma;
 
 import android.content.res.Resources;
 
+import com.parse.FindCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseRole;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -95,6 +97,17 @@ public class SportEvent extends ParseObject {
             e.printStackTrace();
             throw new RuntimeException();
         }
+    }
+
+    public void getComments(FindCallback<CommentSportEvent> callback, boolean online) {
+        ParseQuery<CommentSportEvent> query = ParseQuery.getQuery(CommentSportEvent.class);
+        query.whereEqualTo(CommentSportEvent.SPORT_EVENT, this);
+        query.orderByAscending(CommentSportEvent.DATE);
+        if(!online){
+            query.fromLocalDatastore();
+        }
+        query.findInBackground(callback);
+
     }
 
 }

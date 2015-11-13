@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:layout_marginTop="@dimen/padding_medium">
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/new_comment_input_layout"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/button_new_comment">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_new_comment"
+            android:id="@+id/new_comment"/>
+    </android.support.design.widget.TextInputLayout>
+    <Button
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:id="@id/button_new_comment"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="@dimen/padding_large"
+        android:layout_alignBottom="@id/new_comment_input_layout"
+        android:background="@drawable/button_send"/>
+    <ProgressBar android:id="@+id/comment_new_progress"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"/>
+
+</RelativeLayout>

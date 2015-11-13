@@ -3,6 +3,7 @@ package example.com.usma;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -22,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -95,6 +97,12 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (ParseUser.getCurrentUser() == null) {
+            Intent goToLogin = new Intent(getApplication(), LoginActivity.class);
+            startActivity(goToLogin);
+            return;
+        }
+
         if((savedInstanceState != null) &&
                 savedInstanceState.containsKey(CURRENT_FRAGMENT_TAG)){
             currentFragmentTag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG);
@@ -205,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void selectItem(int position) {
         // update the main content by replacing fragments
-        if(position != 0 || position <= fragments.size()) {
+        if(position != 0 && position <= fragments.size()) {
             if(NavigationMenu.RACES.getId() + 1 == position) {
                 setCurrentFragmentTag(LIST_FRAGMENT_RACE);
             } else if (NavigationMenu.TRAINING.getId() + 1 == position) {
@@ -229,11 +237,11 @@ public class MainActivity extends AppCompatActivity implements
             ft.replace(R.id.content_frame, currentFragment, currentFragmentTag);
             ft.commit();
             initNewButton();
-
+            // update selected item title, then close the drawer
+            collapsingToolbarLayout.setTitle(getString(navigationMenu[position - 1].getNameID()));
+            getDrawer().closeDrawers();
         }
-        // update selected item title, then close the drawer
-        collapsingToolbarLayout.setTitle(getString(navigationMenu[position-1].getNameID()));
-        getDrawer().closeDrawers();
+
     }
 
     public List<Fragment> getFragments() {
@@ -318,8 +326,7 @@ public class MainActivity extends AppCompatActivity implements
             // If there is no connection, let the user know the sync didn't happen
             initFragmentsFromLocalDataStore();
             Toast.makeText(
-                    getApplicationContext(),
-                    "Your device appears to be offline. Some todos may not have been synced to Parse.",
+                    getApplicationContext(), R.string.offline_warning,
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -433,27 +440,32 @@ public class MainActivity extends AppCompatActivity implements
                     queryGroups.findInBackground(new FindCallback<ParseRole>() {
                         @Override
                         public void done(List<ParseRole> listRole, ParseException e) {
-                            adminRole = ((ListFragmentGroups) fragments.get(NavigationMenu.GROUPS.
-                                    getId())).getAdminRole();
-                            try {
-                                ParseUser.unpinAll(PARSE_PIN_USERS_IN_GROUPS);
-                            } catch (ParseException e1) {
-                                e1.printStackTrace();
+                            if(e == null) {
+                                adminRole = ((ListFragmentGroups) fragments.get(NavigationMenu.GROUPS.
+                                        getId())).getAdminRole();
+                                try {
+                                    ParseUser.unpinAll(PARSE_PIN_USERS_IN_GROUPS);
+                                } catch (ParseException e1) {
+                                    e1.printStackTrace();
+                                }
+                                for (ParseRole group : listRole
+                                        ) {
+                                    group.getUsers().getQuery().findInBackground(new FindCallback<ParseUser>() {
+                                        @Override
+                                        public void done(List<ParseUser> users, ParseException e) {
+                                            //Pin all users attached to a group
+                                            ParseUser.pinAllInBackground(PARSE_PIN_USERS_IN_GROUPS, users);
+                                        }
+                                    });
+                                }
+                                setGroups(listRole);
+                                Toast debug = Toast.makeText(getApplication(), "Groups Loaded",
+                                        Toast.LENGTH_LONG);
+                                debug.show();
+                            } else {
+                                Toast.makeText(getApplication(), R.string.group_cant_load,
+                                        Toast.LENGTH_LONG).show();
                             }
-                            for (ParseRole group : listRole
-                                    ) {
-                                group.getUsers().getQuery().findInBackground(new FindCallback<ParseUser>() {
-                                    @Override
-                                    public void done(List<ParseUser> users, ParseException e) {
-                                        //Pin all users attached to a group
-                                        ParseUser.pinAllInBackground(PARSE_PIN_USERS_IN_GROUPS, users);
-                                    }
-                                });
-                            }
-                            setGroups(listRole);
-                            Toast debug = Toast.makeText(getApplication(), "Groups Loaded",
-                                    Toast.LENGTH_LONG);
-                            debug.show();
                         }
                     });
                     ListFragmentGroups fragmentGroups = ListFragmentGroups.newInstance();
@@ -500,9 +512,11 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString(CURRENT_FRAGMENT_TAG, currentFragmentTag);
-        outState.putString(CURRENT_TITLE_TAG, collapsingToolbarLayout.getTitle().toString());
-        outState.putInt(CURRENT_HEADER_IMAGE_ID_TAG, headerImageID);
+        if (ParseUser.getCurrentUser() != null) {
+            outState.putString(CURRENT_FRAGMENT_TAG, currentFragmentTag);
+            outState.putString(CURRENT_TITLE_TAG, collapsingToolbarLayout.getTitle().toString());
+            outState.putInt(CURRENT_HEADER_IMAGE_ID_TAG, headerImageID);
+        }
         super.onSaveInstanceState(outState);
     }
 
@@ -621,6 +635,10 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             hideFab(true);
         }
+    }
+    public void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager)this.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
     }
 
     public String getCurrentFragmentTag() {

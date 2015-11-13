@@ -10,6 +10,13 @@
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">Sign in</string>
+    <string name="group_cant_load">Impossible de charger les groupes...
+        Vérifiez votre connexion internet</string>
+    <string name="comment_cant_load">Impossible de charger les commentaires...
+        Vérifiez votre connexion internet</string>
+    <string name="offline_warning">Vous n\'êtes pas connecté à internet, certaines fonctions
+        sont indisponibles</string>
+    <string name="comment_loading">Chargement des commentaires</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

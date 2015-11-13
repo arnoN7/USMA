@@ -2,6 +2,7 @@ package example.com.usma;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -13,19 +14,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -42,15 +38,14 @@ public class ConsultSportEvent extends Fragment {
     private static final String CURRENT_SPORT_TYPE_TAG = "currentTitleTag";
 
     private OnFragmentInteractionListener mListener;
-    private TextView mTitleEvent, mDescriptionEvent, mAddressEvent, mDayOfWeek, mDayOfMonth, mYear,
-    mMonth, mTextComment;
+
     private SportEvent sportEvent;
     private NavigationMenu navigationType;
-    private Button mButtonNewComment;
     private RecyclerView mRecyclerViewComment;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
     private int position;
+    private Context context;
 
     /**
      * Use this factory method to create a new instance of
@@ -92,28 +87,11 @@ public class ConsultSportEvent extends Fragment {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_consult_sport_event, container, false);
-        mTitleEvent = (TextView) view.findViewById(R.id.sport_event_name);
-        mDescriptionEvent = (TextView) view.findViewById(R.id.sport_event_description);
-        mAddressEvent = (TextView) view.findViewById(R.id.sport_event_address);
-        mDayOfWeek = (TextView) view.findViewById(R.id.day_of_week_event);
-        mDayOfMonth = (TextView) view.findViewById(R.id.day_of_month_event);
-        mMonth = (TextView) view.findViewById(R.id.month_event);
-        mYear = (TextView) view.findViewById(R.id.year_event);
-        mButtonNewComment = (Button) view.findViewById(R.id.button_new_comment);
+
         mRecyclerViewComment = (RecyclerView) view.findViewById(R.id.comment_layout);
-        mTextComment = (TextView) view.findViewById(R.id.new_comment);
+
 
         sportEvent = loadSportEvent();
-
-        mTitleEvent.setText(sportEvent.getName());
-        mDescriptionEvent.setText(sportEvent.getDescription());
-        mAddressEvent.setText(sportEvent.getAddress());
-        Calendar cal = USMAApplication.DateToCalendar(sportEvent.getDate());
-        mYear.setText(String.valueOf(cal.get(Calendar.YEAR)));
-        mMonth.setText(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()));
-        mDayOfMonth.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
-        mDayOfWeek.setText(cal.getDisplayName(Calendar.DAY_OF_WEEK,
-                Calendar.LONG, Locale.getDefault()));
         setHeaderImage();
         ((MainActivity)getActivity()).hideFab(true);
         mRecyclerViewComment.setHasFixedSize(false);
@@ -121,38 +99,16 @@ public class ConsultSportEvent extends Fragment {
                 getActivity().getResources().getConfiguration().orientation, false);
         mRecyclerViewComment.setLayoutManager(mLayoutManager);
         // specify an adapter with empty list of comment
-        mAdapter = new ListCommentsAdapter(new ArrayList<CommentSportEvent>());
+        mAdapter = new ListCommentsAdapter(getActivity(), new ArrayList<CommentSportEvent>(),
+                sportEvent, true);
         mRecyclerViewComment.setAdapter(mAdapter);
         //Load comments from the cloud
-        notifyDataSetChanged(true);
-
-        mButtonNewComment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final CommentSportEvent comment = new CommentSportEvent();
-                comment.setAuthor(ParseUser.getCurrentUser().getString(User.FIRSTNAME) + " " +
-                        ParseUser.getCurrentUser().getString(User.NAME));
-                comment.setText(mTextComment.getText().toString());
-                comment.setSportEvent(sportEvent);
-                comment.saveEventually(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        notifyDataSetChanged(false);
-                    }
-                });
-                try {
-                    comment.pin();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
+        loadComments(true);
 
         return view;
     }
 
-    private void notifyDataSetChanged(boolean refresh) {
+    private void loadComments(boolean refresh) {
         if(mRecyclerViewComment != null) {
             ParseQuery<CommentSportEvent> query = ParseQuery.getQuery(CommentSportEvent.class);
             query.whereEqualTo(CommentSportEvent.SPORT_EVENT, sportEvent);
@@ -161,7 +117,7 @@ public class ConsultSportEvent extends Fragment {
                 query.fromLocalDatastore();
                 try {
                     List<CommentSportEvent> comments = query.find();
-                    refreshRecyclerView(comments, mAdapter);
+                    refreshRecyclerView(comments, false);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -170,7 +126,13 @@ public class ConsultSportEvent extends Fragment {
                     @Override
                     public void done(List<CommentSportEvent> comments, ParseException e) {
                         try {
-                            refreshRecyclerView(comments, mAdapter);
+                            if (comments != null) {
+                                refreshRecyclerView(comments, false);
+                            } else {
+                                ((ListCommentsAdapter)mAdapter).showError(true);
+                                Toast.makeText(getActivity().getApplication(), R.string.comment_cant_load,
+                                        Toast.LENGTH_LONG);
+                            }
                         } catch (ParseException e1) {
                             e1.printStackTrace();
                         }
@@ -182,11 +144,13 @@ public class ConsultSportEvent extends Fragment {
         }
     }
 
-    private void refreshRecyclerView(List<CommentSportEvent> comments, RecyclerView.Adapter mAdapter) throws ParseException {
+    private void refreshRecyclerView(List<CommentSportEvent> comments, boolean isLoading)
+            throws ParseException {
         CommentSportEvent.unpinAll();
         CommentSportEvent.pinAllInBackground(comments);
-        mAdapter = new ListCommentsAdapter(comments);
+        mAdapter = new ListCommentsAdapter(getActivity(), comments, sportEvent, isLoading);
         mRecyclerViewComment.setAdapter(mAdapter);
+
         ViewGroup.LayoutParams params = mRecyclerViewComment.getLayoutParams();
     }
 
