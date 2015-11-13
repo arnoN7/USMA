@@ -17,7 +17,7 @@
         android:layout_marginLeft="@dimen/padding_large"
         android:layout_marginRight="@dimen/padding_large"
         card_view:cardCornerRadius="4dp"
-        android:elevation="5dp"
+        card_view:cardPreventCornerOverlap="false"
         android:id="@+id/cv_comment">
         <RelativeLayout
             android:layout_width="wrap_content"

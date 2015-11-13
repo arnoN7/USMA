@@ -39,7 +39,7 @@ import java.util.Locale;
  * Use the {@link NewUser#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NewUser extends Fragment {
+public class NewUser extends Fragment implements FragmentSpecialClosing{
 
     private EditText inputName, inputEmail, inputFirstname, inputLicence;
     private TextInputLayout inputLayoutName, inputLayoutFirstname, inputLayoutEmail,
@@ -278,6 +278,11 @@ public class NewUser extends Fragment {
         //// TODO: 02/11/2015  
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void specialClose() {
+        closeNewUser();
     }
 
     /**

@@ -33,7 +33,7 @@ import com.parse.SaveCallback;
  * Use the {@link NewGroup#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NewGroup extends Fragment {
+public class NewGroup extends Fragment implements FragmentSpecialClosing{
 
     private OnFragmentInteractionListener mListener;
     private TextInputLayout inputLayoutGroupName, inputLayoutGroupDescription;
@@ -181,6 +181,11 @@ public class NewGroup extends Fragment {
         super.onPause();
         //show plus button
         ((MainActivity)getActivity()).hideFab(false);
+    }
+
+    @Override
+    public void specialClose() {
+        closeNewGroup();
     }
 
     /**

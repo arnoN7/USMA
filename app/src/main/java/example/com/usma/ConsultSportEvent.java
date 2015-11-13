@@ -32,7 +32,7 @@ import java.util.List;
  * Use the {@link ConsultSportEvent#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ConsultSportEvent extends Fragment {
+public class ConsultSportEvent extends Fragment implements FragmentSpecialClosing {
 
     private static final String CURRENT_POSITION_TAG = "currentFragmentTag";
     private static final String CURRENT_SPORT_TYPE_TAG = "currentTitleTag";
@@ -206,6 +206,11 @@ public class ConsultSportEvent extends Fragment {
         ((MainActivity)getActivity()).hideFab(false);
     }
 
+    @Override
+    public void specialClose() {
+        closeConsultSport();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -245,5 +250,6 @@ public class ConsultSportEvent extends Fragment {
         inflater.inflate(R.menu.new_toolbar, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
+
 
 }

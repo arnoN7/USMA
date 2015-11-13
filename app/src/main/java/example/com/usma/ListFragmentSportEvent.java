@@ -42,10 +42,12 @@ public class ListFragmentSportEvent extends ListFragment{
         if(sportEventsType == NavigationMenu.RACES) {
             ft.replace(R.id.content_frame, fragment, MainActivity.LIST_FRAGMENT_NEW_RACE);
             ((MainActivity)activity).setCurrentFragmentTag(MainActivity.LIST_FRAGMENT_NEW_RACE);
+            ft.addToBackStack(MainActivity.LIST_FRAGMENT_NEW_RACE);
         } else if (sportEventsType == NavigationMenu.TRAINING) {
             ft.replace(R.id.content_frame, fragment, MainActivity.LIST_FRAGMENT_NEW_TRAINING);
             ((MainActivity)activity).setCurrentFragmentTag(MainActivity.
                     LIST_FRAGMENT_NEW_TRAINING);
+            ft.addToBackStack(MainActivity.LIST_FRAGMENT_NEW_RACE);
         }
         ft.commit();
     }
@@ -67,10 +69,12 @@ public class ListFragmentSportEvent extends ListFragment{
             ft.replace(R.id.content_frame, fragment, MainActivity.LIST_FRAGMENT_CONSULT_RACE);
             ((MainActivity)getActivity()).
                     setCurrentFragmentTag(MainActivity.LIST_FRAGMENT_CONSULT_RACE);
+            ft.addToBackStack(MainActivity.LIST_FRAGMENT_CONSULT_RACE);
         } else if (sportEventsType == NavigationMenu.TRAINING) {
             ft.replace(R.id.content_frame, fragment, MainActivity.LIST_FRAGMENT_CONSULT_TRAINING);
             ((MainActivity)getActivity()).setCurrentFragmentTag(MainActivity.
                     LIST_FRAGMENT_CONSULT_TRAINING);
+            ft.addToBackStack(MainActivity.LIST_FRAGMENT_CONSULT_TRAINING);
         }
         ft.commit();
     }
@@ -92,5 +96,10 @@ public class ListFragmentSportEvent extends ListFragment{
                     + getString(sportEventsType.getNameID()));
         }
         mRecyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    public void specialClose() {
+        //Nothing its a root fragment
     }
 }

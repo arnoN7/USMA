@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements
     public static final String PARSE_PIN_USER_TAG = "USERS";
     public static final String PARSE_PIN_USERS_IN_GROUPS = "UsersInGroups";
     public static final String PARSE_PIN_RACE_TAG = "RACE";
+    public static final String PARSE_PIN_TRAINING_TAG = "TRAINING";
 
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
@@ -173,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements
             Fragment currentFragment = fragmentManager.findFragmentByTag(currentFragmentTag);
             FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(R.id.content_frame, currentFragment, currentFragmentTag);
+            ft.addToBackStack(currentFragmentTag);
             ft.commit();
             String title = savedInstanceState.getString(CURRENT_TITLE_TAG);
             collapsingToolbarLayout.setTitle(title);
@@ -234,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             FragmentTransaction ft = fragmentManager.beginTransaction();
+            //Clear Back stack because moving to Root Fragment
             ft.replace(R.id.content_frame, currentFragment, currentFragmentTag);
             ft.commit();
             initNewButton();
@@ -272,26 +275,23 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void setTrainings(final List<SportEvent> trainings, boolean online) {
-        for (SportEvent sportEvent: trainings
-             ) {
-            sportEvent.getACL().setReadAccess(ParseUser.getCurrentUser(), true);
-            pinSportEventGroups(online, sportEvent);
-        }
-        SportEvent.pinAllInBackground(trainings);
-        if (currentFragmentTag.equals(LIST_FRAGMENT_TRAINING)) {
-            ((ListFragment) fragments.get(NavigationMenu.TRAINING.getId())).notifyDataSetChanged();
-        }
-    }
-
-    public void setRaces(final List<SportEvent> races, boolean online) {
+    public void setSportEvent(final List<SportEvent> sportEvents, NavigationMenu type,
+                              boolean online) {
         try {
-            SportEvent.unpinAll(PARSE_PIN_RACE_TAG);
+            if(type==NavigationMenu.RACES) {
+                SportEvent.unpinAll(PARSE_PIN_RACE_TAG);
+            } else {
+                SportEvent.unpinAll(PARSE_PIN_TRAINING_TAG);
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        SportEvent.pinAllInBackground(PARSE_PIN_RACE_TAG, races);
-        for (SportEvent sportEvent: races
+        if(type == NavigationMenu.RACES) {
+            SportEvent.pinAllInBackground(PARSE_PIN_RACE_TAG, sportEvents);
+        } else {
+            SportEvent.pinAllInBackground(PARSE_PIN_TRAINING_TAG, sportEvents);
+        }
+        for (SportEvent sportEvent: sportEvents
                 ) {
             sportEvent.getACL().setReadAccess(ParseUser.getCurrentUser(), true);
             pinSportEventGroups(online, sportEvent);
@@ -300,14 +300,17 @@ public class MainActivity extends AppCompatActivity implements
         if (currentFragmentTag.equals(LIST_FRAGMENT_RACE)) {
             ((ListFragment) fragments.get(NavigationMenu.RACES.getId())).notifyDataSetChanged();
         }
+        if (currentFragmentTag.equals(LIST_FRAGMENT_TRAINING)) {
+            ((ListFragment) fragments.get(NavigationMenu.TRAINING.getId())).notifyDataSetChanged();
+        }
     }
 
-    private void pinSportEventGroups(boolean online, SportEvent sportEvent) {
+    private void pinSportEventGroups(boolean online, final SportEvent sportEvent) {
         if(online) {
             sportEvent.getGroupsRelation().getQuery().findInBackground(new FindCallback<ParseRole>() {
                 @Override
                 public void done(List<ParseRole> groups, ParseException e) {
-                    ParseRole.pinAllInBackground(groups);
+                    ParseRole.pinAllInBackground(sportEvent.getObjectId(), groups);
                 }
             });
         }
@@ -379,14 +382,14 @@ public class MainActivity extends AppCompatActivity implements
                                 fragment = ListFragmentSportEvent.newInstance(navigationMenu[i]);
                             }
                             fragments.add(fragment);
-                            setRaces(querySportEvent.find(), false);
+                            setSportEvent(querySportEvent.find(), navigationMenu[i], false);
                         } else {
                             fragment = getLocalFragmentByTag(LIST_FRAGMENT_TRAINING);
                             if(fragment == null) {
                                 fragment = ListFragmentSportEvent.newInstance(navigationMenu[i]);
                             }
                             fragments.add(fragment);
-                            setTrainings(querySportEvent.find(), false);
+                            setSportEvent(querySportEvent.find(), navigationMenu[i], false);
                         }
 
 
@@ -484,11 +487,7 @@ public class MainActivity extends AppCompatActivity implements
                             NavigationMenu sportEventType;
                             if ((sportEvents != null) && (sportEvents.size() > 0)) {
                                 sportEventType = sportEvents.get(0).getType(getResources());
-                                if (sportEventType == NavigationMenu.RACES) {
-                                    setRaces(sportEvents, true);
-                                } else if (sportEventType == NavigationMenu.TRAINING) {
-                                    setTrainings(sportEvents, true);
-                                }
+                                setSportEvent(sportEvents, sportEventType, true);
                                 Toast debug = Toast.makeText(getApplication(),
                                         getString(sportEventType.getNameID()) + " loaded",
                                         Toast.LENGTH_LONG);
@@ -643,5 +642,14 @@ public class MainActivity extends AppCompatActivity implements
 
     public String getCurrentFragmentTag() {
         return currentFragmentTag;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(getFragmentManager().getBackStackEntryCount() != 0) {
+            ((FragmentSpecialClosing)getCurrentFragment()).specialClose();
+        } else {
+            //super.onBackPressed();
+        }
     }
 }

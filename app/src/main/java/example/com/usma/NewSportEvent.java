@@ -44,7 +44,7 @@ import java.util.Locale;
  * Use the {@link NewSportEvent#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NewSportEvent extends Fragment {
+public class NewSportEvent extends Fragment implements FragmentSpecialClosing{
 
     private OnFragmentInteractionListener mListener;
     private TextInputLayout inputLayoutTrainingName, inputLayoutTrainingAddress,
@@ -354,6 +354,11 @@ public class NewSportEvent extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void specialClose() {
+        closeNewTraining();
     }
 
     /**

@@ -33,6 +33,7 @@ public class ListFragmentUsers  extends ListFragment{
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.content_frame, fragment, MainActivity.LIST_FRAGMENT_NEW_USER);
+        ft.addToBackStack(MainActivity.LIST_FRAGMENT_NEW_USER);
         ((MainActivity)getActivity()).setCurrentFragmentTag(MainActivity.LIST_FRAGMENT_NEW_USER);
         ft.commit();
     }
@@ -54,4 +55,8 @@ public class ListFragmentUsers  extends ListFragment{
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    @Override
+    public void specialClose() {
+        //Nothing its a root fragment
+    }
 }

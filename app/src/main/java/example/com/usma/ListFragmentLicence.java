@@ -26,4 +26,9 @@ public class ListFragmentLicence extends ListFragment {
     public void notifyDataSetChanged() {
         //TODO
     }
+
+    @Override
+    public void specialClose() {
+        //Nothing its a root fragment
+    }
 }

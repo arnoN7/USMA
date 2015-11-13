@@ -28,6 +28,7 @@ public class ListFragmentGroups extends ListFragment {
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.content_frame, fragment, MainActivity.LIST_FRAGMENT_NEW_GROUP);
+        ft.addToBackStack(MainActivity.LIST_FRAGMENT_NEW_GROUP);
         ((MainActivity)getActivity()).setCurrentFragmentTag(MainActivity.LIST_FRAGMENT_NEW_GROUP);
         ft.commit();
     }
@@ -67,5 +68,10 @@ public class ListFragmentGroups extends ListFragment {
             mAdapter = new ListItemAdapter.ListItemAdapterGroup(getActivity());
             mRecyclerView.setAdapter(mAdapter);
         }
+    }
+
+    @Override
+    public void specialClose() {
+        //Nothing its a root fragment
     }
 }

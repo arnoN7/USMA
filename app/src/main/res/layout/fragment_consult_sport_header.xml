@@ -33,6 +33,7 @@
             android:layout_marginRight="@dimen/padding_medium"
             android:paddingTop="@dimen/padding_medium"
             card_view:cardCornerRadius="4dp"
+            card_view:cardPreventCornerOverlap="false"
             android:layout_below="@id/sport_event_description">
             <RelativeLayout
                 android:layout_width="match_parent"
