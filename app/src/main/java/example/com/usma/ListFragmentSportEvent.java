@@ -6,8 +6,10 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -87,19 +89,34 @@ public class ListFragmentSportEvent extends ListFragment{
     }
 
     public void notifyDataSetChanged() {
+        List<SportEvent> sportEvents;
         if(sportEventsType == NavigationMenu.RACES) {
             mAdapter = new ListItemAdapter.ListItemAdapterRace(getActivity());
+            sportEvents = ((MainActivity)getActivity()).getSportEvent(NavigationMenu.RACES);
         } else if (sportEventsType == NavigationMenu.TRAINING) {
             mAdapter = new ListItemAdapter.ListItemAdapterTraining(getActivity());
+            sportEvents = ((MainActivity)getActivity()).getSportEvent(NavigationMenu.TRAINING);
         } else {
             throw new RuntimeException("Illegal NavigationMenu item in SportEvent "
                     + getString(sportEventsType.getNameID()));
         }
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.getLayoutManager().scrollToPosition(getNextEventPosition(sportEvents));
     }
 
     @Override
     public void specialClose() {
         //Nothing its a root fragment
+    }
+
+    private int getNextEventPosition(List<SportEvent> sportEvents) {
+        Calendar cal = null;
+        for (int i = 0; i < sportEvents.size(); i++) {
+            cal = USMAApplication.DateToCalendar(sportEvents.get(i).getDate());
+            if (cal.after(Calendar.getInstance())) {
+                return i;
+            }
+        }
+        return (sportEvents.size() - 1);
     }
 }
