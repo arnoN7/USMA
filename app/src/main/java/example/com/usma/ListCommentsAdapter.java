@@ -8,13 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -43,7 +46,8 @@ public class ListCommentsAdapter extends
             mMonth, mNewTextComment, mCommentLoadingTitle;
     private static Button mButtonNewComment;
     private static ProgressBar progressBar;
-    private static ProgressBar progressBarNewComment;
+    private static ProgressBar progressBarNewComment, progressBarJoined;
+    private static Switch mJoinEvent;
     private static Activity activity;
 
     public ListCommentsAdapter(Activity activity, List<CommentSportEvent> comments,
@@ -52,6 +56,7 @@ public class ListCommentsAdapter extends
         this.sportEvent = sportEvent;
         this.activity = activity;
         this.isCommentsLoading = isCommentsLoading;
+
     }
 
     @Override
@@ -97,6 +102,21 @@ public class ListCommentsAdapter extends
             mDayOfMonth.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
             mDayOfWeek.setText(cal.getDisplayName(Calendar.DAY_OF_WEEK,
                     Calendar.LONG, Locale.getDefault()));
+            if(MainActivity.getLoadedJoinedEvents() == null) {
+                showLoadingJoined(true);
+            } else {
+                mJoinEvent.setChecked(User.isEventJoined(sportEvent));
+                mJoinEvent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked == true) {
+                            User.addJoinedEvent(sportEvent);
+                        } else {
+                            User.removeJoinedEvent(sportEvent);
+                        }
+                    }
+                });
+            }
         } else if (holder.holderID == TYPE_ITEM) {
             CommentSportEvent comment = comments.get(position - 1);
             Calendar cal = USMAApplication.DateToCalendar(comment.getCreatedAt());
@@ -195,6 +215,8 @@ public class ListCommentsAdapter extends
                 mMonth = (TextView) itemView.findViewById(R.id.month_event);
                 mYear = (TextView) itemView.findViewById(R.id.year_event);
                 progressBar = (ProgressBar) itemView.findViewById(R.id.comment_loading_progress);
+                mJoinEvent = (Switch) itemView.findViewById(R.id.join_event);
+                progressBarJoined = (ProgressBar) itemView.findViewById(R.id.join_event_progress);
                 mCommentLoadingTitle = (TextView) itemView.findViewById(R.id.comment_loading_title);
                 holderID = TYPE_HEADER;
             } else {
@@ -218,6 +240,17 @@ public class ListCommentsAdapter extends
             mCommentLoadingTitle.setVisibility(View.GONE);
         }
     }
+
+    public void showLoadingJoined(boolean show) {
+        if(show) {
+            progressBarJoined.setVisibility(View.VISIBLE);
+            mJoinEvent.setVisibility(View.GONE);
+        } else {
+            progressBarJoined.setVisibility(View.GONE);
+            mJoinEvent.setVisibility(View.VISIBLE);
+        }
+    }
+
     public void showError(boolean show) {
         if(show) {
             progressBar.setVisibility(View.GONE);

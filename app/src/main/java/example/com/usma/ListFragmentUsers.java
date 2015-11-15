@@ -40,7 +40,7 @@ public class ListFragmentUsers  extends ListFragment{
 
     @Override
     public void consultItemAction(int position) {
-        //TODO
+        //Users are not consultable
     }
 
     @Override

@@ -35,8 +35,7 @@ public class ListFragmentGroups extends ListFragment {
 
     @Override
     public void consultItemAction(int position) {
-        //update the main content by replacing fragments
-        //TODO
+        //Groups are not consultable all can be seen in the list
     }
 
     public static ListFragmentGroups newInstance() {

@@ -27,6 +27,7 @@ import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseRole;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -224,7 +225,20 @@ public class NewSportEvent extends Fragment implements FragmentSpecialClosing{
         try {
             //public read access need to be True to read it in localdatastore
             currentSportEvent.getACL().setReadAccess(ParseUser.getCurrentUser(),true);
-            currentSportEvent.saveEventually();
+            currentSportEvent.saveEventually(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    String message;
+                    if(currentSportEvent.getType(getActivity().getResources())
+                            == NavigationMenu.RACES) {
+                        message = getActivity().getString(R.string.start_push_race) + " ";
+                    } else {
+                        message = getActivity().getString(R.string.start_push_training) + " ";
+                    }
+                    message += currentSportEvent.getName();
+                    GroupUsers.sendPUSHToGroup(currentSportEvent.getGroups(false), message);
+                }
+            });
             currentSportEvent.pin();
             //set false for cloud
             //currentSportEvent.getACL().setPublicReadAccess(false);

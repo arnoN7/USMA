@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseRole;
 import com.parse.ParseUser;
 
@@ -65,12 +66,15 @@ public class MainActivity extends AppCompatActivity implements
     public static final String PARSE_PIN_USERS_IN_GROUPS = "UsersInGroups";
     public static final String PARSE_PIN_RACE_TAG = "RACE";
     public static final String PARSE_PIN_TRAINING_TAG = "TRAINING";
+    public static final String PARSE_PIN_JOINED_SPORT_TAG = "JOINED_SPORT";
+    public static final String PARSE_PIN_CURRENT_USER_TAG = "CURRENT_USER";
 
     //First We Declare Titles And Icons For Our Navigation Drawer List View
     //This Icons And Titles Are holded in an Array as you can see
     public NavigationMenu[] navigationMenu = {NavigationMenu.RACES, NavigationMenu.TRAINING,
             NavigationMenu.GROUPS, NavigationMenu.LICENCE, NavigationMenu.USERS};
     private List<Fragment> fragments;
+    private static List<SportEvent> joinedEvents;
     private String currentFragmentTag;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private ImageView headerImage;
@@ -426,8 +430,6 @@ public class MainActivity extends AppCompatActivity implements
                         @Override
                         public void done(List<ParseUser> objects, ParseException e) {
                             if (e == null) {
-                                Toast debug = Toast.makeText(getApplication(), "Users Loaded", Toast.LENGTH_LONG);
-                                debug.show();
                                 setUsers(objects);
                             } else {
 
@@ -436,7 +438,8 @@ public class MainActivity extends AppCompatActivity implements
                     });
                     ListFragmentUsers fragment = ListFragmentUsers.newInstance();
                     fragments.add(fragment);
-
+                    //Load user's joined events
+                    setJoignedEvents();
                     break;
                 case GROUPS:
                     ParseQuery<ParseRole> queryGroups = ParseRole.getQuery();
@@ -462,9 +465,6 @@ public class MainActivity extends AppCompatActivity implements
                                     });
                                 }
                                 setGroups(listRole);
-                                Toast debug = Toast.makeText(getApplication(), "Groups Loaded",
-                                        Toast.LENGTH_LONG);
-                                debug.show();
                             } else {
                                 Toast.makeText(getApplication(), R.string.group_cant_load,
                                         Toast.LENGTH_LONG).show();
@@ -488,10 +488,6 @@ public class MainActivity extends AppCompatActivity implements
                             if ((sportEvents != null) && (sportEvents.size() > 0)) {
                                 sportEventType = sportEvents.get(0).getType(getResources());
                                 setSportEvent(sportEvents, sportEventType, true);
-                                Toast debug = Toast.makeText(getApplication(),
-                                        getString(sportEventType.getNameID()) + " loaded",
-                                        Toast.LENGTH_LONG);
-                                debug.show();
                             }
                         }
                     });
@@ -507,6 +503,23 @@ public class MainActivity extends AppCompatActivity implements
 
             }
         }
+    }
+
+    public static void setJoignedEvents() {
+        ParseRelation<SportEvent> relation = ParseUser.getCurrentUser().
+                getRelation(User.JOINEDEVENTS);
+        ParseQuery<SportEvent> query = relation.getQuery();
+        query.findInBackground(new FindCallback<SportEvent>() {
+            @Override
+            public void done(List<SportEvent> objects, ParseException e) {
+                //Cannot save this request in the localdatastore due to relation...
+                joinedEvents = objects;
+            }
+        });
+    }
+
+    public static List<SportEvent> getLoadedJoinedEvents() {
+        return joinedEvents;
     }
 
     @Override

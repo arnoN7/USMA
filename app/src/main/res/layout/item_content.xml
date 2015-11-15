@@ -93,6 +93,7 @@
                 android:paddingBottom="@dimen/padding_small"
                 android:layout_below="@id/sport_event_name"
                 android:layout_centerHorizontal="true"/>
+
             <TextView
                 android:layout_width="@dimen/date_shower_width_list"
                 android:layout_height="wrap_content"

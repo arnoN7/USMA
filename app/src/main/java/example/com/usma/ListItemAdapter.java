@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseRole;
@@ -271,16 +272,21 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
             ParseRole group = groups.get(position);
             holder.mTextViewName.setText(group.getString(GroupUsers.NAME));
             holder.mTextViewDescription.setText(group.getString(GroupUsers.DESCRIPTION));
-            holder.mSignInGroupButton.setVisibility(View.VISIBLE);
+            holder.mSignInGroupButton.setVisibility(View.GONE);
+            holder.progressBar.setVisibility(View.VISIBLE);
             group.getUsers().getQuery().
                     findInBackground(new FindCallback<ParseUser>() {
                         @Override
                         public void done(List<ParseUser> users, ParseException e) {
-                            for (int i = 0; i < users.size(); i++) {
-                                if (users.get(i).getUsername().
-                                        equals(ParseUser.getCurrentUser().getUsername())) {
-                                    setSignedInGroup(holder);
-                                    break;
+                            if(users != null) {
+                                holder.mSignInGroupButton.setVisibility(View.VISIBLE);
+                                holder.progressBar.setVisibility(View.GONE);
+                                for (int i = 0; i < users.size(); i++) {
+                                    if (users.get(i).getUsername().
+                                            equals(ParseUser.getCurrentUser().getUsername())) {
+                                        setSignedInGroup(holder);
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -291,7 +297,7 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
                 public void onClick(View v) {
                     holder.mSignInGroupButton.setVisibility(View.GONE);
                     holder.progressBar.setVisibility(View.VISIBLE);
-                    ParseRole group = groups.get(position);
+                    final ParseRole group = groups.get(position);
                     if (holder.mSignInGroupButton.getText().toString().
                             equals(context.getString(R.string.action_sign_in_group))) {
                         group.getUsers().add(ParseUser.getCurrentUser());
@@ -299,21 +305,22 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
                     } else {
                         group.getUsers().remove(ParseUser.getCurrentUser());
                     }
-                    try {
-                        group.save();
-                        ((MainActivity) context).initFragments();
-                        holder.progressBar.setVisibility(View.GONE);
-                        holder.mSignInGroupButton.setVisibility(View.VISIBLE);
-                        if (holder.mSignInGroupButton.getText().toString().
-                                equals(context.getString(R.string.action_sign_in_group))) {
-                            setSignedInGroup(holder);
-                        } else {
-                            setSignedOutGroup(holder);
+                    group.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            ((MainActivity) context).initFragments();
+                            holder.progressBar.setVisibility(View.GONE);
+                            holder.mSignInGroupButton.setVisibility(View.VISIBLE);
+                            if (holder.mSignInGroupButton.getText().toString().
+                                    equals(context.getString(R.string.action_sign_in_group))) {
+                                setSignedInGroup(holder);
+                                ParsePush.subscribeInBackground(group.getObjectId());
+                            } else {
+                                ParsePush.unsubscribeInBackground(group.getObjectId());
+                                setSignedOutGroup(holder);
+                            }
                         }
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+                    });
                 }
             });
         }

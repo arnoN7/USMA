@@ -8,6 +8,7 @@ import android.view.WindowManager;
 
 import com.parse.Parse;
 import com.parse.ParseACL;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -31,22 +32,7 @@ public class USMAApplication extends Application{
         // enable the Local Datastore
         Parse.enableLocalDatastore(getApplicationContext());
         Parse.initialize(this, "MGT2MkcrSNgKQU56BuFE7CsJUt74q79mbFAXD7c9", "Z9zTcIVDu4Qmjs6YrEwSuiB6Cv3RpptN4dv1zRnz");
-        //ParseUser.enableRevocableSessionInBackground();
-        //ParseUser.enableAutomaticUser();
-        //ParseACL defaultACL = new ParseACL();
-        //ParseACL.setDefaultACL(defaultACL, true);
-
-
-        /*ParsePush.("", new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
-                } else {
-                    Log.e("com.parse.push", "failed to subscribe for push", e);
-                }
-            }
-        });*/
+        ParseInstallation.getCurrentInstallation().saveInBackground();
     }
 
     public static Context getContext() {

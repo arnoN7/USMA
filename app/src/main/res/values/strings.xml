@@ -16,7 +16,10 @@
         Vérifiez votre connexion internet</string>
     <string name="offline_warning">Vous n\'êtes pas connecté à internet, certaines fonctions
         sont indisponibles</string>
+    <string name="join_event">Participer </string>
     <string name="comment_loading">Chargement des commentaires</string>
+    <string name="start_push_training">Nouvel Entraînement :</string>
+    <string name="start_push_race">Nouvelle Course :</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

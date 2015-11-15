@@ -22,8 +22,6 @@ import java.util.List;
  * to handle interaction events.
  */
 public abstract class ListFragment extends Fragment implements FragmentSpecialClosing{
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     protected RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
     protected RecyclerView.Adapter mAdapter;
