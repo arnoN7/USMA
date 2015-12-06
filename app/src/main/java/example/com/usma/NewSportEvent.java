@@ -236,7 +236,9 @@ public class NewSportEvent extends Fragment implements FragmentSpecialClosing{
                         message = getActivity().getString(R.string.start_push_training) + " ";
                     }
                     message += currentSportEvent.getName();
-                    GroupUsers.sendPUSHToGroup(currentSportEvent.getGroups(false), message);
+                    USMAApplication.sendPUSHNotifToGroups(currentSportEvent.getGroups(false),
+                            message, currentSportEvent.getType(getActivity().getResources()),
+                            currentSportEvent);
                 }
             });
             currentSportEvent.pin();

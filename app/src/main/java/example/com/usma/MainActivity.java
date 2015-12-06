@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +34,9 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseRole;
 import com.parse.ParseUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -188,6 +192,23 @@ public class MainActivity extends AppCompatActivity implements
             selectItem(NavigationMenu.RACES.getId()+1);
         }
         initNewButton();
+        Intent intent = getIntent();
+        String objectId = intent.getStringExtra(SportEvent.ObjectID);
+        String menuType = intent.getStringExtra(SportEvent.MENU_TYPE);
+        if (objectId != null && menuType != null) {
+            //Intent received from Parse Notification
+            ParseQuery<SportEvent> query = ParseQuery.getQuery(SportEvent.class);
+            query.fromLocalDatastore();
+            query.whereEqualTo(SportEvent.ObjectID, objectId);
+            try {
+                int position = 0;
+                List<SportEvent> sportEvents = query.find();
+
+                ((ListFragment)getCurrentFragment()).consultItemAction(position);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
@@ -301,10 +322,12 @@ public class MainActivity extends AppCompatActivity implements
             pinSportEventGroups(online, sportEvent);
 
         }
-        if (currentFragmentTag.equals(LIST_FRAGMENT_RACE)) {
+        if (currentFragmentTag.equals(LIST_FRAGMENT_RACE) && type == NavigationMenu.RACES) {
+            //Update view if a RACE has been changed in fragment RACE
             ((ListFragment) fragments.get(NavigationMenu.RACES.getId())).notifyDataSetChanged();
         }
-        if (currentFragmentTag.equals(LIST_FRAGMENT_TRAINING)) {
+        if (currentFragmentTag.equals(LIST_FRAGMENT_TRAINING) && type == NavigationMenu.TRAINING) {
+            //Update view if a TRAINING has been changed in fragment TRAINING
             ((ListFragment) fragments.get(NavigationMenu.TRAINING.getId())).notifyDataSetChanged();
         }
     }
@@ -438,8 +461,6 @@ public class MainActivity extends AppCompatActivity implements
                     });
                     ListFragmentUsers fragment = ListFragmentUsers.newInstance();
                     fragments.add(fragment);
-                    //Load user's joined events
-                    setJoignedEvents();
                     break;
                 case GROUPS:
                     ParseQuery<ParseRole> queryGroups = ParseRole.getQuery();
@@ -454,15 +475,23 @@ public class MainActivity extends AppCompatActivity implements
                                 } catch (ParseException e1) {
                                     e1.printStackTrace();
                                 }
-                                for (ParseRole group : listRole
+                                for (final ParseRole group : listRole
                                         ) {
                                     group.getUsers().getQuery().findInBackground(new FindCallback<ParseUser>() {
                                         @Override
                                         public void done(List<ParseUser> users, ParseException e) {
                                             //Pin all users attached to a group
                                             ParseUser.pinAllInBackground(PARSE_PIN_USERS_IN_GROUPS, users);
+                                            //reload channel for notification in case of new installation
+                                            for (ParseUser user: users
+                                                 ) {
+                                                if(user.equals(ParseUser.getCurrentUser())) {
+                                                    GroupUsers.subscribeToGroup(group);
+                                                }
+                                            }
                                         }
                                     });
+
                                 }
                                 setGroups(listRole);
                             } else {
@@ -503,23 +532,6 @@ public class MainActivity extends AppCompatActivity implements
 
             }
         }
-    }
-
-    public static void setJoignedEvents() {
-        ParseRelation<SportEvent> relation = ParseUser.getCurrentUser().
-                getRelation(User.JOINEDEVENTS);
-        ParseQuery<SportEvent> query = relation.getQuery();
-        query.findInBackground(new FindCallback<SportEvent>() {
-            @Override
-            public void done(List<SportEvent> objects, ParseException e) {
-                //Cannot save this request in the localdatastore due to relation...
-                joinedEvents = objects;
-            }
-        });
-    }
-
-    public static List<SportEvent> getLoadedJoinedEvents() {
-        return joinedEvents;
     }
 
     @Override

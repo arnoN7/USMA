@@ -20,6 +20,7 @@
     <string name="comment_loading">Chargement des commentaires</string>
     <string name="start_push_training">Nouvel Entraînement :</string>
     <string name="start_push_race">Nouvelle Course :</string>
+    <string name="start_push_comment">Nouveau Commentaire sur</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>

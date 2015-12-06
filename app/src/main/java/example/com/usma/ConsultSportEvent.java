@@ -95,8 +95,8 @@ public class ConsultSportEvent extends Fragment implements FragmentSpecialClosin
         setHeaderImage();
         ((MainActivity)getActivity()).hideFab(true);
         mRecyclerViewComment.setHasFixedSize(false);
-        mLayoutManager = new LinearLayoutManager(getActivity(),
-                getActivity().getResources().getConfiguration().orientation, false);
+        mLayoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL
+               , false);
         mRecyclerViewComment.setLayoutManager(mLayoutManager);
         // specify an adapter with empty list of comment
         mAdapter = new ListCommentsAdapter(getActivity(), new ArrayList<CommentSportEvent>(),

@@ -314,9 +314,9 @@ public abstract class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapt
                             if (holder.mSignInGroupButton.getText().toString().
                                     equals(context.getString(R.string.action_sign_in_group))) {
                                 setSignedInGroup(holder);
-                                ParsePush.subscribeInBackground(group.getObjectId());
+                                GroupUsers.subscribeToGroup(group);
                             } else {
-                                ParsePush.unsubscribeInBackground(group.getObjectId());
+                                GroupUsers.unsubscribeToGroup(group);
                                 setSignedOutGroup(holder);
                             }
                         }

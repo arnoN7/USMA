@@ -15,15 +15,11 @@ public class GroupUsers {
     public static final String DESCRIPTION = "description";
     public static final String ADMIN = "admin";
 
-    public static void sendPUSHToGroup(List<ParseRole> groups, String message) {
-        ParsePush push = new ParsePush();
-        LinkedList<String> channels = new LinkedList<>();
-        for (ParseRole group: groups
-             ) {
-            channels.add(group.getObjectId());
-        }
-        push.setChannels(channels);
-        push.setMessage(message);
-        push.sendInBackground();
+    public static void subscribeToGroup(ParseRole group) {
+        ParsePush.subscribeInBackground(USMAApplication.NOTIF_GROUP + group.getObjectId());
+    }
+
+    public static void unsubscribeToGroup(ParseRole group) {
+        ParsePush.unsubscribeInBackground(USMAApplication.NOTIF_GROUP + group.getObjectId());
     }
 }

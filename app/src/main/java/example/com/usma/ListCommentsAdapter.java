@@ -1,23 +1,18 @@
 package example.com.usma;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseQuery;
-import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -46,7 +41,7 @@ public class ListCommentsAdapter extends
             mMonth, mNewTextComment, mCommentLoadingTitle;
     private static Button mButtonNewComment;
     private static ProgressBar progressBar;
-    private static ProgressBar progressBarNewComment, progressBarJoined;
+    private static ProgressBar progressBarNewComment;
     private static Switch mJoinEvent;
     private static Activity activity;
 
@@ -102,21 +97,17 @@ public class ListCommentsAdapter extends
             mDayOfMonth.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
             mDayOfWeek.setText(cal.getDisplayName(Calendar.DAY_OF_WEEK,
                     Calendar.LONG, Locale.getDefault()));
-            if(MainActivity.getLoadedJoinedEvents() == null) {
-                showLoadingJoined(true);
-            } else {
-                mJoinEvent.setChecked(User.isEventJoined(sportEvent));
-                mJoinEvent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked == true) {
-                            User.addJoinedEvent(sportEvent);
-                        } else {
-                            User.removeJoinedEvent(sportEvent);
-                        }
+            mJoinEvent.setChecked(User.isEventJoined(sportEvent));
+            mJoinEvent.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked == true) {
+                        User.subscribeToEvent(sportEvent);
+                    } else {
+                        User.unsubscribeToEvent(sportEvent);
                     }
-                });
-            }
+                }
+            });
         } else if (holder.holderID == TYPE_ITEM) {
             CommentSportEvent comment = comments.get(position - 1);
             Calendar cal = USMAApplication.DateToCalendar(comment.getCreatedAt());
@@ -149,6 +140,11 @@ public class ListCommentsAdapter extends
                                         mNewTextComment.setText("");
                                         ((MainActivity) activity).hideKeyboard();
                                         comments = objects;
+                                        USMAApplication.sendPUSHNotifToEvent(sportEvent,
+                                                activity.getString(R.string.start_push_comment) +
+                                                        " " + sportEvent.getName(),
+                                                sportEvent.getType(activity.getResources()),
+                                                sportEvent.getObjectId());
                                         notifyDataSetChanged();
                                     }
                                 }, true);
@@ -216,7 +212,6 @@ public class ListCommentsAdapter extends
                 mYear = (TextView) itemView.findViewById(R.id.year_event);
                 progressBar = (ProgressBar) itemView.findViewById(R.id.comment_loading_progress);
                 mJoinEvent = (Switch) itemView.findViewById(R.id.join_event);
-                progressBarJoined = (ProgressBar) itemView.findViewById(R.id.join_event_progress);
                 mCommentLoadingTitle = (TextView) itemView.findViewById(R.id.comment_loading_title);
                 holderID = TYPE_HEADER;
             } else {
@@ -238,16 +233,6 @@ public class ListCommentsAdapter extends
         } else {
             progressBar.setVisibility(View.GONE);
             mCommentLoadingTitle.setVisibility(View.GONE);
-        }
-    }
-
-    public void showLoadingJoined(boolean show) {
-        if(show) {
-            progressBarJoined.setVisibility(View.VISIBLE);
-            mJoinEvent.setVisibility(View.GONE);
-        } else {
-            progressBarJoined.setVisibility(View.GONE);
-            mJoinEvent.setVisibility(View.VISIBLE);
         }
     }
 

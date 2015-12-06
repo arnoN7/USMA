@@ -28,6 +28,10 @@ public class SportEvent extends ParseObject {
     public static final String SPORT_TYPE = "sport_type";
     public static final String GROUPS = "groups";
     public static final String COMMENTLIST = "comments";
+    public static final String ObjectID = "objectId";
+    public static final String CreatedAt = "createdAt";
+    public static final String UpdatedAt = "updatedAt";
+
     private ParseRelation<ParseRole> relation;
 
     public String getName() {

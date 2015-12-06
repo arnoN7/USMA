@@ -2,6 +2,8 @@ package example.com.usma;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -18,40 +20,28 @@ public class User {
     public static final String FIRSTNAME = "firstname";
     public static final String BIRTHDATE = "birthdate";
     public static final String LICENCE = "licence";
-    public static final String JOINEDEVENTS = "joined_events";
+    public static final String CHANNELS = "channels";
+
 
     public static boolean isEventJoined(SportEvent event) {
-        List<SportEvent> joinedEvents = MainActivity.getLoadedJoinedEvents();
-        for (SportEvent joinedEvent : joinedEvents
-                ) {
-            if(joinedEvent.getObjectId().equals(event.getObjectId())) {
-                return true;
+        List<String> channels = ParseInstallation.getCurrentInstallation().getList("channels");
+        if(channels != null) {
+            for (String channel : channels
+                    ) {
+                if (channel.equals(USMAApplication.NOTIF_JOINEDEVENTS + event.getObjectId())) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    public static void addJoinedEvent(SportEvent event) {
-        ParseRelation<SportEvent> relation = ParseUser.getCurrentUser().
-                getRelation(User.JOINEDEVENTS);
-        relation.add(event);
-        ParseUser.getCurrentUser().saveEventually(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                MainActivity.setJoignedEvents();
-            }
-        });
+    public static void subscribeToEvent(SportEvent event) {
+        ParsePush.subscribeInBackground(USMAApplication.NOTIF_JOINEDEVENTS + event.getObjectId());
     }
 
-    public static void removeJoinedEvent(SportEvent event) {
-        ParseRelation<SportEvent> relation = ParseUser.getCurrentUser().
-                getRelation(User.JOINEDEVENTS);
-        relation.remove(event);
-        ParseUser.getCurrentUser().saveEventually(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                MainActivity.setJoignedEvents();
-            }
-        });
+    public static void unsubscribeToEvent(SportEvent event) {
+        ParsePush.unsubscribeInBackground(USMAApplication.NOTIF_JOINEDEVENTS + event.getObjectId());
+
     }
 }

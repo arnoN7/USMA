@@ -20,17 +20,6 @@
             android:id="@+id/join_event"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true" />
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/join_event"
-            android:id="@+id/join_event_progress"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            style="?android:attr/progressBarStyleSmall"
-            android:layout_marginBottom="8dp"
-            android:layout_centerHorizontal="true"
-            android:visibility="gone" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
